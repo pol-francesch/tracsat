@@ -1,5 +1,6 @@
 # Import pysicktim library as "lidar"
-import pysicktim as lidar
+import lidar_lib as lidar
+# import pysicktim as lidar
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
