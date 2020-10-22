@@ -81,8 +81,8 @@ error_descriptions = {
     "Sopas_Error_HubAddressDecoding": "The Sopas Hubaddress is invalid, it can not be decoded (Syntax).",
     "Sopas_Error_HubAddressAddressExceeded": "Too many hubs in the address",
     "Sopas_Error_HubAddressBlankExpected": "When parsing a HubAddress an expected blank was not found. The HubAddress is not valid.",
-    "Sopas_Error_AsyncMethodsAreSuppressed": "An asynchronous method call was made although the device was built with \“AsyncMethodsSuppressed\”. This is an internal error that should never happen in a released device.",
-    "Sopas_Error_ComplexArraysNotSupported": "Device was built with „ComplexArraysSuppressed“ because the compiler does not allow recursions. But now a complex dataay was found. This is an internal error that should never happen in a released device."
+    "Sopas_Error_AsyncMethodsAreSuppressed": "An asynchronous method call was made although the device was built with \"AsyncMethodsSuppressed\". This is an internal error that should never happen in a released device.",
+    "Sopas_Error_ComplexArraysNotSupported": "Device was built with \"ComplexArraysSuppressed\" because the compiler does not allow recursions. But now a complex dataay was found. This is an internal error that should never happen in a released device."
     }
 
 timeout = 500
