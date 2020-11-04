@@ -5,7 +5,7 @@ from cv2 import cv2
 cap = cv2.VideoCapture(2)
 
 # Setting FPS
-cap.set(cv2.CAP_PROP_FPS, 1)
+# cap.set(cv2.CAP_PROP_FPS, 1)
 
 # Get one frame to figure out sizing contraints
 _, frame = cap.read()
@@ -20,7 +20,7 @@ while(True):
     ret, frame = cap.read()
 
     # Resize frame
-    frame = cv2.resize(frame, dim, interpolation=cv2.INTER_AREA)
+    # frame = cv2.resize(frame, dim, interpolation=cv2.INTER_AREA)
 
     # Our operations on the frame come here
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
