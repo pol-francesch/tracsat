@@ -3,7 +3,8 @@ try:
     from pynq.overlays.base import BaseOverlay
     from pynq.lib.arduino import Arduino_IO
     from pynq.lib import PynqMicroblaze
-    from time import sleepprint("Excellent. Successfully imported all dependencies.")
+    from time import sleep
+    print("Excellent. Successfully imported all dependencies.")
 except ImportError as identifier:
     print("TracSat stopped. Failed to import a required dependency. See the error below: ")
     print(identifier)
