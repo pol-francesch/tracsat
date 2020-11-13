@@ -10,6 +10,7 @@ except ImportError as identifier:
     print(identifier)
     exit(1)
 
+base = BaseOverlay("base.bit")
 # Set up solenoids
 sol1 = Arduino_IO(base.iop_arduino.mb_info, 0, 'out')
 sol2 = Arduino_IO(base.iop_arduino.mb_info, 1, 'out')
