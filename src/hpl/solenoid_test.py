@@ -28,4 +28,6 @@ while True:
     print("Turning off solenoids")
 
     sol1.write(0x00)
-    sol2.write(0x00) 
+    sol2.write(0x00)
+
+    sleep(5)
