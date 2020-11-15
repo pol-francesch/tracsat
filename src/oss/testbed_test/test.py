@@ -26,13 +26,16 @@ while True:
         # Get video frame
         frame = video.getFrameBits()
 
-        # TODO: Write video frame to file
+        # Write video frame to file
+        video_file.write(frame)
 
         # Get LIDAR data
         raw_data = lidar.get_scan()
         obj_data = lidar.get_obs_data()
 
-        # TODO: Write LIDAR data
+        # Write LIDAR data
+        raw_file.write(raw_file)
+        obj_file.write(obj_data)
 
     except KeyboardInterrupt:
         break
