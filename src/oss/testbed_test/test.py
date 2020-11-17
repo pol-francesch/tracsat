@@ -22,20 +22,25 @@ obj_file = open("obj_data.txt", "w")
 
 # Loop
 while True:
-    try: 
+    try:
+        print("Running")
         # Get video frame
         frame = video.getFrameBits()
+        frame_string = ",".join(frame)
 
         # Write video frame to file
-        video_file.write(' '.join(frame))
+        video_file.write(frame_string + "\n")
 
         # Get LIDAR data
         raw_data = lidar.get_scan()
         obj_data = lidar.get_obs_data()
 
+        raw_data_string = ",".join([str(i) for i in raw_data])
+        obj_data_string = ",".join([str(i) for i in obj_data])
+
         # Write LIDAR data
-        raw_file.write(' '.join(raw_data))
-        obj_file.write(' '.join(obj_data))
+        raw_file.write(raw_data_string + "\n")
+        obj_file.write(obj_data_string + "\n")
 
     except KeyboardInterrupt:
         break
