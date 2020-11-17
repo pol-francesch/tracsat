@@ -5,7 +5,7 @@
 
 from lidar import Lidar
 from video import Video
-
+import time
 # Data we want to store:
 # Camera: as bytes
 # LIDAR: raw data
@@ -20,8 +20,11 @@ video_file = open("video_out.txt", "w")
 raw_file = open("lidar_raw_data.txt", "w")
 obj_file = open("obj_data.txt", "w")
 
+# End time
+t_end = time.time() + 60 * 1 # Runs for 1 minute
+
 # Loop
-while True:
+while time.time() < t_end:
     try:
         print("Running")
         # Get video frame
