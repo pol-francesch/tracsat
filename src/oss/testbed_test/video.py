@@ -10,7 +10,7 @@ def intToBits(x):
 
 class Video:
     # scale_percent: percent of original size of frame
-    def __init__(self, scale_percent):
+    def __init__(self, scale_percent=100):
         self.cap = cv2.VideoCapture(0)
 
         # Get one frame to figure out sizing contraints

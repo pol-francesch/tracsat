@@ -3,8 +3,8 @@
 # We want to save their data to files
 # Then once the test is over, we will read the files in a separate Python script and do some cool stuff with it
 
-from classes.lidar import Lidar
-from classes.video import Video
+from lidar import Lidar
+from video import Video
 
 # Data we want to store:
 # Camera: as bytes
