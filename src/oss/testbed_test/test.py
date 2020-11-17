@@ -27,15 +27,15 @@ while True:
         frame = video.getFrameBits()
 
         # Write video frame to file
-        video_file.write(frame)
+        video_file.write(' '.join(frame))
 
         # Get LIDAR data
         raw_data = lidar.get_scan()
         obj_data = lidar.get_obs_data()
 
         # Write LIDAR data
-        raw_file.write(raw_file)
-        obj_file.write(obj_data)
+        raw_file.write(' '.join(raw_data))
+        obj_file.write(' '.join(obj_data))
 
     except KeyboardInterrupt:
         break
