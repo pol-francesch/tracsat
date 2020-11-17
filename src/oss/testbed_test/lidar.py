@@ -1,4 +1,4 @@
-import classes.lidar_lib as tim
+import lidar_lib as tim
 import numpy as np
 
 def calc_rms(vals):
