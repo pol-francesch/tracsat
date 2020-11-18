@@ -21,7 +21,7 @@ raw_file = open("lidar_raw_data.txt", "w")
 obj_file = open("obj_data.txt", "w")
 
 # End time
-t_end = time.time() + 60 * 1 # Runs for 1 minute
+t_end = time.time() + 60 # Runs for 1 minute
 
 # Loop
 while time.time() < t_end:
