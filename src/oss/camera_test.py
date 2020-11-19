@@ -2,7 +2,7 @@ import numpy as np
 from cv2 import cv2
 
 # Getting video
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 
 # Setting FPS
 # cap.set(cv2.CAP_PROP_FPS, 1)
@@ -30,6 +30,7 @@ while(True):
     # cv2.resizeWindow("TracSat", 1000, 1000)
 
     cv2.imshow('TracSat', gray)
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
