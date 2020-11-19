@@ -6,9 +6,9 @@ from cv2 import cv2
 # This file is here to read the output data, and create plots or video
 
 # TODO: Read data from files
-video_file = open("/home/polfr/Documents/PurdueTracSat/video_out.txt", "r")
-raw_file = open("/home/polfr/Documents/PurdueTracSat/lidar_raw_data.txt", "r")
-obj_file = open("/home/polfr/Documents/PurdueTracSat/obj_data.txt", "r")
+video_file = open("/home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/video_out.txt", "r")
+raw_file = open("/home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/lidar_raw_data.txt", "r")
+obj_file = open("/home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/obj_data.txt", "r")
 
 # TODO: Show video from data
 cap = cv2.VideoCapture(0)
@@ -99,10 +99,10 @@ def show_obs():
 # TODO: Main control
 if __name__ == '__main__':
     # Run code for video
-    #show_video()
+    show_video()
 
     # Run code for LIDAR raw data
     #show_raw_data()
 
     # Run code for LIDAR object data
-    show_obs()
+    # show_obs()

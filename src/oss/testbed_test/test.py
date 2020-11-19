@@ -23,6 +23,11 @@ obj_file = open("/home/xilinx/tracsat/src/oss/testbed_test/obj_data.txt", "w")
 # End time
 t_end = time.time() + 60 * 5 # Runs for 1 minute
 
+# Create arrays here
+frames = []
+raws = []
+objs = []
+
 # Loop
 while time.time() < t_end:
     try:
@@ -32,7 +37,7 @@ while time.time() < t_end:
         frame_string = ",".join(frame)
 
         # Write video frame to file
-        video_file.write(frame_string + "\n")
+        frames.append(frame_string)
 
         # Get LIDAR data
         raw_data = lidar.get_scan()
@@ -42,11 +47,20 @@ while time.time() < t_end:
         obj_data_string = ",".join([str(i) for i in obj_data])
 
         # Write LIDAR data
-        raw_file.write(raw_data_string + "\n")
-        obj_file.write(obj_data_string + "\n")
+        raws.append(raw_data_string)
+        objs.append(obj_data_string)
 
     except KeyboardInterrupt:
         break
+
+# Write to files
+print("File writing")
+for frame in frames:
+    video_file.write(frame + "\n")
+for raw in raws:
+    raw_file.write(raw + "\n")
+for obj in objs:
+    obj_file.write(obj + "\n")
 
 # Close files
 print("Closing all files")
