@@ -33,7 +33,7 @@ while time.time() < t_end:
     try:
         print("Running")
         # Get video frame
-        frame = video.getFrameBits()
+        frame = video.getFrame()
         # frame_string = ",".join(frame)
 
         # Write video frame to file
