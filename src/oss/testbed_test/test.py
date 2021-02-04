@@ -12,7 +12,7 @@ import time
 # LIDAR: for the object determination
 
 # Initialize components
-lidar = Lidar()
+# lidar = Lidar()
 video = Video()
 
 # Initialize file writing
@@ -40,15 +40,15 @@ while time.time() < t_end:
         frames.append(frame_string)
 
         # Get LIDAR data
-        raw_data = lidar.get_scan()
-        obj_data = lidar.get_obs_data()
+        # raw_data = lidar.get_scan()
+        # obj_data = lidar.get_obs_data()
 
-        raw_data_string = ",".join([str(i) for i in raw_data])
-        obj_data_string = ",".join([str(i) for i in obj_data])
+        # raw_data_string = ",".join([str(i) for i in raw_data])
+        # obj_data_string = ",".join([str(i) for i in obj_data])
 
         # Write LIDAR data
-        raws.append(raw_data_string)
-        objs.append(obj_data_string)
+        # raws.append(raw_data_string)
+        # objs.append(obj_data_string)
 
     except KeyboardInterrupt:
         break
