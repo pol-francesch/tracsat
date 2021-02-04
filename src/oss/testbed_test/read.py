@@ -6,9 +6,9 @@ from cv2 import cv2
 # This file is here to read the output data, and create plots or video
 
 # TODO: Read data from files
-video_file = open("/home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/video_out.txt", "r")
-raw_file = open("/home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/lidar_raw_data.txt", "r")
-obj_file = open("/home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/obj_data.txt", "r")
+video_file = open("/home/polfr/Documents/tracsat/src/oss/testbed_test/video_out.txt", "r")
+raw_file = open("/home/polfr/Documents/tracsat/src/oss/testbed_test/lidar_raw_data.txt", "r")
+obj_file = open("/home/polfr/Documents/tracsat/src/oss/testbed_test/obj_data.txt", "r")
 
 # TODO: Show video from data
 cap = cv2.VideoCapture(0)
@@ -35,7 +35,7 @@ def show_video():
     cv2.destroyAllWindows()
 
 # TODO: Show animation of lidar from data
-fig = plt.figure()
+fig = plt.figure(figsize=(15,10))
 fig.canvas.set_window_title('TiM561 LIDAR Monitor')
 lidar_polar = plt.subplot(polar=True)
 
@@ -46,11 +46,13 @@ def animate(i):
 
     # Create theta
     theta = np.linspace(45, 315, len(data))
+    theta = (np.pi/180.0) * theta                       # Convert to radians
+    theta = [float(x) for x in theta]
 
     # Plot
     lidar_polar.clear()
-    lidar_polar.set_thetamax(45)
-    lidar_polar.set_thetamin(315)
+    lidar_polar.set_thetamax(315)
+    lidar_polar.set_thetamin(45)
     plt.fill_between(theta, data, alpha=0.2)
     lidar_polar.scatter(theta, data, s=1, c=data)
 
