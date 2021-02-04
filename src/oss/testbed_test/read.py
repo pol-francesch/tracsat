@@ -99,10 +99,10 @@ def show_obs():
 # TODO: Main control
 if __name__ == '__main__':
     # Run code for video
-    show_video()
+    # show_video()
 
     # Run code for LIDAR raw data
-    #show_raw_data()
+    show_raw_data()
 
     # Run code for LIDAR object data
     # show_obs()
