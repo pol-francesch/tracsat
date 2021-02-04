@@ -34,10 +34,10 @@ while time.time() < t_end:
         print("Running")
         # Get video frame
         frame = video.getFrameBits()
-        frame_string = ",".join(frame)
+        # frame_string = ",".join(frame)
 
         # Write video frame to file
-        frames.append(frame_string)
+        # frames.append(frame_string)
 
         # Get LIDAR data
         # raw_data = lidar.get_scan()
