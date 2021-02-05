@@ -42,7 +42,7 @@ while time.time() < t_end:
         # # Write video frame to file
         frames.append(frame)
 
-        # # Get LIDAR data
+        # Get LIDAR data
         # raw_data = lidar.get_scan()
         # obj_data = lidar.get_obs_data()
 
