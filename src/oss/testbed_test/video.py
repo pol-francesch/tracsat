@@ -8,6 +8,20 @@ def intToBits(x):
     
     return send
 
+def binary_repr(x):
+    return (
+        np.dstack((
+            np.bitwise_and(x, 0b10000000) >> 7,
+            np.bitwise_and(x, 0b1000000) >> 6,
+            np.bitwise_and(x, 0b100000) >> 5,
+            np.bitwise_and(x, 0b10000) >> 4,
+            np.bitwise_and(x, 0b1000) >> 3,
+            np.bitwise_and(x, 0b100) >> 2,
+            np.bitwise_and(x, 0b10) >> 1,
+            np.bitwise_and(x, 0b1)
+        )). flatten() > 0
+    )
+
 class Video:
     # scale_percent: percent of original size of frame
     def __init__(self, scale_percent=100):
@@ -19,9 +33,6 @@ class Video:
         width = int(frame.shape[1] * scale_percent / 100)
         height = int(frame.shape[0] * scale_percent / 100)
         self.dim = (width, height)
-    
-    def __del__(self):
-        self.cap.release()
     
     # color: If true show color frames. Not yet implemented
     def getFrame(self, color=False):
@@ -35,7 +46,7 @@ class Video:
     
     def getFrameBits(self):
         frame = self.getFrame()
-        frame_bits = []
+        frame_bits = [intToBits(pixel) for row in frame for pixel in row]
 
         for row in frame:
             for pixel in row:
@@ -43,6 +54,15 @@ class Video:
         
         return frame_bits
     
+    def getFrameBitsFast(self):
+        frame = self.getFrame()
+        frame_bits = binary_repr(frame)
+
+        return frame_bits
+    
+    def __del__(self):
+        self.cap.release()
+
     def getVideo(self, color=False):
         while True:
             frame = self.getFrame(color=color)
