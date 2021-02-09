@@ -21,9 +21,9 @@ video = Video()
 # /home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/data/video_out.txt
 path_xilinx = "/home/xilinx/tracsat/src/oss/testbed_test/data/"
 path_pc = "/home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/data/"
-video_file = open(path_pc + "video_out.txt", "w")
-raw_file = open(path_pc + "lidar_raw_data.txt", "w")
-obj_file = open(path_pc + "obj_data.txt", "w")
+video_file = open(path_xilinx + "video_out.txt", "w")
+raw_file = open(path_xilinx + "lidar_raw_data.txt", "w")
+obj_file = open(path_xilinx + "obj_data.txt", "w")
 
 # End time
 t_end = time.time() + 10 # Runs for 30s
