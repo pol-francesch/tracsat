@@ -1,4 +1,5 @@
 import numpy as np
+import time
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from cv2 import cv2
@@ -6,9 +7,11 @@ from cv2 import cv2
 # This file is here to read the output data, and create plots or video
 
 # Read data from files
-video_file = open("/home/polfr/Documents/tracsat/src/oss/testbed_test/data/video_out.txt", "r")
-raw_file = open("/home/polfr/Documents/tracsat/src/oss/testbed_test/data/lidar_raw_data.txt", "r")
-obj_file = open("/home/polfr/Documents/tracsat/src/oss/testbed_test/data/obj_data.txt", "r")
+path_xilinx = "/home/xilinx/tracsat/src/oss/testbed_test/data/"
+path_pc = "/home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/data/"
+video_file = open(path_pc + "video_out.txt", "r")
+raw_file = open(path_pc + "lidar_raw_data.txt", "r")
+obj_file = open(path_pc + "obj_data.txt", "r")
 
 # Show video from data
 cap = cv2.VideoCapture(0)
@@ -28,6 +31,9 @@ def show_video():
 
         frames.append(frame)
     
+    # Wait for input
+    _ = input("Press any key to show video!")
+    
     print("Showing video")
     cv2.namedWindow("TracSat", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("TracSat", 640*2, 480*2)
@@ -40,20 +46,10 @@ def show_video():
         # Show video
         cv2.imshow('TracSat', arr2d)
 
+        time.sleep(0.01)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
-    # for line in lines:
-    #     # Convert to desired data type
-    #     data = [np.uint8(int(byte, 2)) for byte in line.split(',')]
-    #     arr = np.array(data)
-    #     arr2d = np.reshape(arr, (-1, 640))
-
-    #     # Show in video
-    #     cv2.imshow('TracSat', arr2d)
-
-    #     if cv2.waitKey(1) & 0xFF == ord('q'):
-    #         break
     
     cap.release()
     cv2.destroyAllWindows()
