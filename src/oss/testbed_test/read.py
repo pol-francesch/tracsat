@@ -3,6 +3,7 @@ import time
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from cv2 import cv2
+from tqdm import tqdm
 
 # This file is here to read the output data, and create plots or video
 
@@ -22,7 +23,9 @@ def show_video():
     print('Formatting data to be displayed')
     frames = []
     
-    for line in lines:
+    for i in tqdm(range(0,len(lines))):
+        line = lines[i]
+
         data = [str(bit) for bit in line.split(',')]
         frame = []
         for i in range(0, len(data)-7, 8):
@@ -33,7 +36,7 @@ def show_video():
     
     # Wait for input
     _ = input("Press any key to show video!")
-    
+
     print("Showing video")
     cv2.namedWindow("TracSat", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("TracSat", 640*2, 480*2)
