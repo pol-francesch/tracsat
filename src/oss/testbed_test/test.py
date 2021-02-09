@@ -3,7 +3,7 @@
 # We want to save their data to files
 # Then once the test is over, we will read the files in a separate Python script and do some cool stuff with it
 
-# from lidar import Lidar
+from lidar import Lidar
 from video import Video
 import time
 from tqdm import tqdm
@@ -14,15 +14,15 @@ from tqdm import tqdm
 # LIDAR: for the object determination
 
 # Initialize components
-# lidar = Lidar()
+lidar = Lidar()
 video = Video()
 
 # Initialize file writing
 path_xilinx = "/home/xilinx/tracsat/src/oss/testbed_test/data/video_out.txt"
 path_pc = "/home/polfr/Documents/tracsat/src/oss/testbed_test/data/video_out.txt"
-video_file = open(path_pc, "w")
-# raw_file = open("/home/xilinx/tracsat/src/oss/testbed_test/data/lidar_raw_data.txt", "w")
-# obj_file = open("/home/xilinx/tracsat/src/oss/testbed_test/data/obj_data.txt", "w")
+video_file = open(path_xilinx, "w")
+raw_file = open("/home/xilinx/tracsat/src/oss/testbed_test/data/lidar_raw_data.txt", "w")
+obj_file = open("/home/xilinx/tracsat/src/oss/testbed_test/data/obj_data.txt", "w")
 
 # End time
 t_end = time.time() + 10 # Runs for 30s
@@ -43,15 +43,15 @@ while time.time() < t_end:
         frames.append(frame)
 
         # Get LIDAR data
-        # raw_data = lidar.get_scan()
-        # obj_data = lidar.get_obs_data()
+        raw_data = lidar.get_scan()
+        obj_data = lidar.get_obs_data()
 
-        # raw_data_string = ",".join([str(i) for i in raw_data])
-        # obj_data_string = ",".join([str(i) for i in obj_data])
+        raw_data_string = ",".join([str(i) for i in raw_data])
+        obj_data_string = ",".join([str(i) for i in obj_data])
 
         # Write LIDAR data
-        # raws.append(raw_data_string)
-        # objs.append(obj_data_string)
+        raws.append(raw_data_string)
+        objs.append(obj_data_string)
 
     except KeyboardInterrupt:
         break
@@ -68,13 +68,14 @@ for i in tqdm(range(0,len(frames))):
 
     # Write to file
     video_file.write(frame_string + "\n")
-# for raw in raws:
-#     raw_file.write(raw + "\n")
-# for obj in objs:
-#     obj_file.write(obj + "\n")
+
+for raw in raws:
+    raw_file.write(raw + "\n")
+for obj in objs:
+    obj_file.write(obj + "\n")
 
 # # Close files
 print("Closing all files")
 video_file.close()
-# raw_file.close()
-# obj_file.close()
+raw_file.close()
+obj_file.close()

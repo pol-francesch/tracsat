@@ -48,9 +48,9 @@ class Video:
         frame = self.getFrame()
         frame_bits = [intToBits(pixel) for row in frame for pixel in row]
 
-        for row in frame:
-            for pixel in row:
-                frame_bits.append(intToBits(pixel))
+        # for row in frame:
+        #     for pixel in row:
+        #         frame_bits.append(intToBits(pixel))
         
         return frame_bits
     
