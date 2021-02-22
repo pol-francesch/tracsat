@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 # Read data from files
 path_xilinx = "/home/xilinx/tracsat/src/oss/testbed_test/data/"
-path_pc = "/home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/data/"
+path_pc = "/home/polfr/Documents/tracsat/src/oss/testbed_test/data/data/"
 video_file = open(path_pc + "video_out.txt", "r")
 raw_file = open(path_pc + "lidar_raw_data.txt", "r")
 obj_file = open(path_pc + "obj_data.txt", "r")
@@ -49,11 +49,12 @@ def show_video():
         # Show video
         cv2.imshow('TracSat', arr2d)
 
-        time.sleep(0.01)
+        time.sleep(0.2)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     
+    print(len(frames))
     cap.release()
     cv2.destroyAllWindows()
 
@@ -124,10 +125,10 @@ def show_obs():
 # Main control
 if __name__ == '__main__':
     # Run code for video
-    show_video()
+    # show_video()
 
     # Run code for LIDAR raw data
     # show_raw_data()
 
     # Run code for LIDAR object data
-    # show_obs()
+    show_obs()

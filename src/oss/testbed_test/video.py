@@ -24,15 +24,10 @@ def binary_repr(x):
 
 class Video:
     # scale_percent: percent of original size of frame
-    def __init__(self, scale_percent=100):
+    def __init__(self, dim=(640,480)):
         self.cap = cv2.VideoCapture(0)
-
-        # Get one frame to figure out sizing contraints
-        _, frame = self.cap.read()
-
-        width = int(frame.shape[1] * scale_percent / 100)
-        height = int(frame.shape[0] * scale_percent / 100)
-        self.dim = (width, height)
+        self.dim = dim
+        self.oldFrame = False
     
     # color: If true show color frames. Not yet implemented
     def getFrame(self, color=False):
@@ -60,6 +55,29 @@ class Video:
 
         return frame_bits
     
+    def getFrameBitCompressed(self):
+        frame = self.getFrame()
+
+        # First check if this is the first frame
+        if type(self.oldFrame) is bool:
+            self.oldFrame = frame
+            return binary_repr(frame)
+        
+        # Compress
+        updateMatrix = ~np.equal(frame, self.oldFrame)*1
+        updatePixels = np.multiply(frame, updateMatrix).flatten()
+        updateMatrix = updateMatrix.flatten()
+        updatePixels = updatePixels[updatePixels != 0]
+        updateBits = binary_repr(updatePixels)*1
+
+        bigDaddy = np.concatenate((updateMatrix, updateBits))
+        self.oldFrame = frame
+
+        # Check which is smaller
+        send = bigDaddy if bigDaddy.shape[0] < frame.shape[0]*frame.shape[1] else frame
+
+        return send        
+
     def __del__(self):
         self.cap.release()
 
@@ -77,11 +95,16 @@ class Video:
     
     def setFPS(self, fps):
         self.cap.set(cv2.CAP_PROP_FPS, fps)
+    
+    def setDim(self, dim):
+        self.dim = dim
+        self.oldFrame = False
+        print(self.dim)
 
 
 if __name__ == '__main__':
-    video = Video(scale_percent=100)
+    video = Video()
 
-    frame = video.getFrameBits()
-
-    print(frame)
+    _ = video.getFrameBitCompressed()
+    _ = video.getFrameBitCompressed()
+    # print(frame)
