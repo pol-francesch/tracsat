@@ -3,7 +3,7 @@ import cProfile, pstats, io
 
 input_size = 2457600
 #since I don't have your image, I made do with a random sample of 8bit numbers.
-test_input = np.random.randint(0, 256, input_size)
+test_input = np.random.randint(0, 256, input_size, dtype=np.uint8)
 #to check that we get the correct result, set input_size to 2
 #and uncomment the line below
 #test_input = [255, 7]
@@ -41,8 +41,10 @@ a = []
 for i in range(input_size):
     a.append(intToBits(test_input[i]))
 #print(a)
+print(type(test_input[0]))
 b = binary_repr(test_input)
 #print(b)
+c = np.unpackbits(test_input)
 
 #the comparison
 sortby = 'cumulative'

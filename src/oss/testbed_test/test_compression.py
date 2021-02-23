@@ -69,6 +69,7 @@ def comparePseudoCompression():
     # Set up arrays
     imageSizes = [(640, 480), (480, 360), (320, 240), (160, 120)]
     times      = np.zeros((2,4))
+    avgShape   = np.zeros((2,4))
 
     # Set up video
     video = Video(dim=imageSizes[0])
@@ -78,13 +79,22 @@ def comparePseudoCompression():
     # First run the normal video time (no compression)
     for i in range(4):
         video.setDim(imageSizes[i])
+        timeSend = 0
 
         t_start = time.time()
-        for j in range(iterations):
-            _ = video.getFrameBitsFast()
+        for _ in range(iterations):
+            frame = video.getFrameBitsFast()
+
+            # Need to add in sending time here
+            timeSend = timeSend + frame.shape[0]/laserBaud
+            avgShape[0][i] = avgShape[0][i] + frame.shape[0]
+
+            # Decompression
+            _ = video.getFrameBitToInt(frame, compressed=False)
         
         # Get time to have frame ready + sending time
-        times[0][i] = (time.time() - t_start) / iterations + imageSizes[i][0]*imageSizes[i][1]/laserBaud*8
+        times[0][i] = (time.time() - t_start) / iterations + timeSend / iterations
+        avgShape[0][i] = avgShape[0][i]/iterations
     
     # Next run the compressed video time
     for i in range(4):
@@ -92,17 +102,25 @@ def comparePseudoCompression():
         timeSend = 0
 
         t_start = time.time()
-        for j in range(iterations):
+        for _ in range(iterations):
             frame = video.getFrameBitCompressed()
 
             # Need to add in sending time here
             timeSend = timeSend + frame.shape[0]/laserBaud
+            avgShape[1][i] = avgShape[1][i] + frame.shape[0]
+
+            # Decompression
+            _ = video.getFrameBitToInt(frame, compressed=True)
+
         
         # Get the average time
         times[1][i] = (time.time() - t_start) / iterations + timeSend / iterations
+        avgShape[1][i] = avgShape[1][i]/iterations
 
     # Plot the different data sets
     print(times)
+    print(avgShape)
+
 
 if __name__ == '__main__':
     comparePseudoCompression()
