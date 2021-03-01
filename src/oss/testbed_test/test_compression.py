@@ -1,5 +1,6 @@
 import numpy as np 
 import matplotlib.pyplot as plt
+from cv2 import cv2
 
 from video import Video
 import time
@@ -61,7 +62,7 @@ def compareImageAndUpdate():
 
 # This will compare the initial compression time (so at the TracSat) between normal sending and compression
 # Let us assume that sampling the time takes the same amount of time, so the relationship will be linear in nature
-def comparePseudoCompression():
+def comparePseudoCompression(color="8bit"):
     # Set up givens
     laserBaud = 50000
     iterations = 50
@@ -72,7 +73,7 @@ def comparePseudoCompression():
     avgShape   = np.zeros((2,4))
 
     # Set up video
-    video = Video(dim=imageSizes[0])
+    video = Video(dim=imageSizes[0], color=color)
 
     # We will want to run this for 100 iterations.
     # Will run each separately
@@ -85,42 +86,109 @@ def comparePseudoCompression():
         for _ in range(iterations):
             frame = video.getFrameBitsFast()
 
-            # Need to add in sending time here
+            # # Need to add in sending time here
             timeSend = timeSend + frame.shape[0]/laserBaud
             avgShape[0][i] = avgShape[0][i] + frame.shape[0]
 
-            # Decompression
-            _ = video.getFrameBitToInt(frame, compressed=False)
+            # # Decompression
+            _ = video.getFrameBitToInt(frame, compressed=False, color='4bit')
         
         # Get time to have frame ready + sending time
-        times[0][i] = (time.time() - t_start) / iterations + timeSend / iterations
+        times[0][i] = (time.time() - t_start) / iterations #+ timeSend / iterations
         avgShape[0][i] = avgShape[0][i]/iterations
     
-    # Next run the compressed video time
-    for i in range(4):
-        video.setDim(imageSizes[i])
-        timeSend = 0
+    # # Next run the compressed video time
+    # for i in range(4):
+    #     video.setDim(imageSizes[i])
+    #     timeSend = 0
 
-        t_start = time.time()
-        for _ in range(iterations):
-            frame = video.getFrameBitCompressed()
+    #     t_start = time.time()
+    #     for _ in range(iterations):
+    #         frame = video.getFrameBitCompressed()
 
-            # Need to add in sending time here
-            timeSend = timeSend + frame.shape[0]/laserBaud
-            avgShape[1][i] = avgShape[1][i] + frame.shape[0]
+    #         # Need to add in sending time here
+    #         timeSend = timeSend + frame.shape[0]/laserBaud
+    #         avgShape[1][i] = avgShape[1][i] + frame.shape[0]
 
-            # Decompression
-            _ = video.getFrameBitToInt(frame, compressed=True)
+    #         # Decompression
+    #         _ = video.getFrameBitToInt(frame, compressed=True)
 
         
-        # Get the average time
-        times[1][i] = (time.time() - t_start) / iterations + timeSend / iterations
-        avgShape[1][i] = avgShape[1][i]/iterations
+    #     # Get the average time
+    #     times[1][i] = (time.time() - t_start) / iterations + timeSend / iterations
+    #     avgShape[1][i] = avgShape[1][i]/iterations
 
     # Plot the different data sets
     print(times)
     print(avgShape)
 
+def compareImages(low=False):
+    # Get openCV started
+    cap = cv2.VideoCapture(0)
+
+    # Create picture
+    cv2.namedWindow("TracSat", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("TracSat", 640*2, 480*2)
+
+    # Now decide which kind of frame to show
+    if low:
+        while(True):
+            # Capture frame-by-frame
+            _, frame = cap.read()
+
+            # Our operations on the frame come here
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+            # Reduce to 4-bit
+            gray = gray - np.remainder(gray, 16)
+            print(gray)
+
+            # Display the resulting frame
+            cv2.imshow('TracSat', gray)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    else:
+        while(True):
+            # Capture frame-by-frame
+            _, frame = cap.read()
+
+            # Our operations on the frame come here
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+            # Display the resulting frame
+            cv2.imshow('TracSat', gray)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+def doesVideoEvenWork(color='8bit'):
+    # Create picture
+    cv2.namedWindow("TracSat", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("TracSat", 640*2, 480*2)
+
+    # Init Video class
+    video = Video(color=color)
+
+    while(True):
+        # Capture frame-by-frame
+        frame = video.getFrameBitsFast()
+        gray = video.getFrameBitToInt(frame, compressed=False, color=color)
+        print(np.max(gray))
+
+        # Compare to a manual interpretation
+        grayM = video.getFrame()
+        # Reduce to 4-bit
+        grayM = grayM - np.remainder(grayM, 16)
+        print(np.max(grayM))
+
+        # Display the resulting frame
+        cv2.imshow('TracSat', gray)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
 
 if __name__ == '__main__':
-    comparePseudoCompression()
+    doesVideoEvenWork(color="4bit")
+    # compareImages(True)

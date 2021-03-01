@@ -63,20 +63,20 @@ class counter(object):
 
 class Video:
     # scale_percent: percent of original size of frame
-    def __init__(self, dim=(640,480)):
+    def __init__(self, dim=(640,480), color='8bit'):
         self.cap = cv2.VideoCapture(0)
         self.dim = dim
         self.oldFrame = False
+        self.color = color
     
-    # color: If true show color frames. Not yet implemented
-    def getFrame(self, color=False):
+    def getFrame(self):
         _, frame = self.cap.read()
 
         frame = cv2.resize(frame, self.dim, interpolation=cv2.INTER_AREA)
 
-        if not color:
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            return gray
+        # Switch frame to greyscale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        return gray
     
     def getFrameBits(self):
         frame = self.getFrame()
@@ -90,8 +90,12 @@ class Video:
     
     def getFrameBitsFast(self):
         frame = self.getFrame()
-        # frame_bits = binary_repr(frame)
-        frame_bits = np.unpackbits(frame)
+        
+        if self.color == '8bit':
+            frame_bits = np.unpackbits(frame)
+        elif self.color == '4bit':
+            frame = np.vstack(np.remainder(frame, 16).flatten())
+            frame_bits = np.unpackbits(frame, axis=1, bitorder='big').flatten()
 
         return frame_bits
     
@@ -120,18 +124,6 @@ class Video:
 
     def __del__(self):
         self.cap.release()
-
-    def getVideo(self, color=False):
-        while True:
-            frame = self.getFrame(color=color)
-
-            cv2.namedWindow("TracSat", cv2.WINDOW_NORMAL)
-
-            cv2.imshow('TracSat', frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        
-        cv2.destroyAllWindows()
     
     def setFPS(self, fps):
         self.cap.set(cv2.CAP_PROP_FPS, fps)
@@ -141,9 +133,17 @@ class Video:
         self.oldFrame = False
         print(self.dim)
     
-    def getFrameBitToInt(self, frame, compressed=False):
+    def setColor(self, color):
+        self.color = color
+        self.oldFrame = False
+    
+    def getFrameBitToInt(self, frame, compressed=False, color='8bit'):
         if not compressed:
-            return np.packbits(frame).reshape(self.dim)
+            # if color == '4bit':
+            #     frame = frame.reshape((self.dim[0]*self.dim[1], 4))
+            #     return 16*np.packbits(frame, axis=-1, bitorder='little').reshape((self.dim[1], self.dim[0]))
+            
+            return 16*np.packbits(frame).reshape((self.dim[1], self.dim[0]))
         else:
             # Check if we sent the compressed version
             if frame[0] == 0:
@@ -175,9 +175,13 @@ class Video:
 
 
 if __name__ == '__main__':
-    video = Video()
+    video = Video(color='8bit')
+    frame8 = video.getFrameBitsFast()
+    print(frame8.shape)
+    print(frame8[0:16])
 
-    frame = video.getFrameBitCompressed()
-    frame = video.getFrameBitCompressed()
-
+    video.setColor('4bit')
+    frame4 = video.getFrameBitsFast()
+    print(frame4.shape)
+    print(frame4[0:16])
     # print(frame)
