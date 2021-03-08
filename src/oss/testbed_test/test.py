@@ -17,16 +17,24 @@ from tqdm import tqdm
 lidar = Lidar()
 video = Video()
 
+# Initialize settings
+compression = True
+color = "8bit"
+dim = (640,480)
+
+video.setColor(color)
+video.setDim(dim)
+
 # Initialize file writing
 # /home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/data/video_out.txt
 path_xilinx = "/home/xilinx/tracsat/src/oss/testbed_test/data/"
-path_pc = "/home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/data/"
+path_pc = "/home/polfr/Documents/tracsat/src/oss/testbed_test/data/"
 video_file = open(path_xilinx + "video_out.txt", "w")
 raw_file = open(path_xilinx + "lidar_raw_data.txt", "w")
 obj_file = open(path_xilinx + "obj_data.txt", "w")
 
 # End time
-t_end = time.time() + 10 # Runs for 30s
+t_end = time.time() + 20 # Runs for 30s
 
 # Create arrays here
 frames = []
@@ -38,7 +46,10 @@ while time.time() < t_end:
     try:
         print("Running")
         # Get video frame
-        frame = video.getFrameBitsFast()
+        if compression:
+            frame = video.getFrameBitCompressed()
+        else:
+            frame = video.getFrameBitsFast()
 
         # # Write video frame to file
         frames.append(frame)

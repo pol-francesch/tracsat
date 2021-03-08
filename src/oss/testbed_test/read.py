@@ -5,11 +5,13 @@ import matplotlib.animation as animation
 from cv2 import cv2
 from tqdm import tqdm
 
+from video import ShowVideo
+
 # This file is here to read the output data, and create plots or video
 
 # Read data from files
 path_xilinx = "/home/xilinx/tracsat/src/oss/testbed_test/data/"
-path_pc = "/home/polfr/Documents/tracsat/src/oss/testbed_test/data/data/"
+path_pc = "/home/polfr/Documents/tracsat/src/oss/testbed_test/data/"
 video_file = open(path_pc + "video_out.txt", "r")
 raw_file = open(path_pc + "lidar_raw_data.txt", "r")
 obj_file = open(path_pc + "obj_data.txt", "r")
@@ -18,7 +20,11 @@ obj_file = open(path_pc + "obj_data.txt", "r")
 cap = cv2.VideoCapture(0)
 
 def show_video():
+    # Get data
     lines = video_file.readlines()
+
+    # Get decompressor
+    showVideo = ShowVideo(color="4bit", compression=False)
 
     print('Formatting data to be displayed')
     frames = []
@@ -26,13 +32,10 @@ def show_video():
     for i in tqdm(range(0,len(lines))):
         line = lines[i]
 
-        data = [str(bit) for bit in line.split(',')]
-        frame = []
-        for i in range(0, len(data)-7, 8):
-            byte = "".join(data[i:i+8])
-            frame.append(np.uint8(int(byte, 2)))
+        data = [int(bit) for bit in line.split(',')]
 
-        frames.append(frame)
+        gray = showVideo.getFrameBitToInt(np.asarray(data))
+        frames.append(gray)
     
     # Wait for input
     _ = input("Press any key to show video!")
@@ -43,13 +46,13 @@ def show_video():
 
     # Iterate through frames and show one by one
     for frame in frames:
-        arr = np.array(frame)
-        arr2d = np.reshape(arr, (-1, 640))
+        # arr = np.array(frame)
+        # arr2d = np.reshape(arr, (-1, 640))
 
         # Show video
-        cv2.imshow('TracSat', arr2d)
+        cv2.imshow('TracSat', frame)
 
-        time.sleep(0.2)
+        time.sleep(0.08)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -125,10 +128,10 @@ def show_obs():
 # Main control
 if __name__ == '__main__':
     # Run code for video
-    # show_video()
+    show_video()
 
     # Run code for LIDAR raw data
     # show_raw_data()
 
     # Run code for LIDAR object data
-    show_obs()
+    # show_obs()
