@@ -18,7 +18,7 @@ lidar = Lidar()
 video = Video()
 
 # Initialize settings
-compression = True
+compression = False
 color = "8bit"
 dim = (640,480)
 
@@ -29,12 +29,14 @@ video.setDim(dim)
 # /home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/data/video_out.txt
 path_xilinx = "/home/xilinx/tracsat/src/oss/testbed_test/data/"
 path_pc = "/home/polfr/Documents/tracsat/src/oss/testbed_test/data/"
-video_file = open(path_xilinx + "video_out.txt", "w")
-raw_file = open(path_xilinx + "lidar_raw_data.txt", "w")
-obj_file = open(path_xilinx + "obj_data.txt", "w")
+video_file = open(path_xilinx + "video_outp.txt", "w")
+raw_file = open(path_xilinx + "lidar_raw_datap.txt", "w")
+obj_file = open(path_xilinx + "obj_datap.txt", "w")
+
+_=input("write")
 
 # End time
-t_end = time.time() + 20 # Runs for 30s
+t_end = time.time() + 10 # Runs for 30s
 
 # Create arrays here
 frames = []

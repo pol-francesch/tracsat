@@ -30,7 +30,7 @@ class Lidar:
 
         # Set fov
         self.fov = fov
-        self.max_distance_fov = 2.4384                           # m, (= 8ft)
+        self.max_distance_fov = 1.524                           # m, (= 5ft)
         self.max_width_fov = 0.6096                              # m, (= 2ft)
         self.min_width_fov = 0.3048                              # m, (= 1ft)
 
