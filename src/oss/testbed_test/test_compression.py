@@ -260,7 +260,12 @@ def doesPseudoCompressionWork(color='8bit', compression=False):
             gray = showVideo.getFrameBitToInt(frame_bits)
 
             # Display the resulting frame
-            cv2.imshow('TracSat', gray)
+            # cv2.imshow('TracSat', gray)
+
+            image = cv2.putText(gray, '60', (50,50), cv2.FONT_HERSHEY_COMPLEX, 
+                        1, (255,0,0), 2, cv2.LINE_AA)
+            
+            cv2.imshow('TracSat', image)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
