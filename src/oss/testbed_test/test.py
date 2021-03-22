@@ -29,9 +29,9 @@ video.setDim(dim)
 # /home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/data/video_out.txt
 path_xilinx = "/home/xilinx/tracsat/src/oss/testbed_test/data/"
 path_pc = "/home/polfr/Documents/tracsat/src/oss/testbed_test/data/"
-video_file = open(path_xilinx + "video_outp.txt", "w")
-raw_file = open(path_xilinx + "lidar_raw_datap.txt", "w")
-obj_file = open(path_xilinx + "obj_datap.txt", "w")
+video_file = open(path_xilinx + "video_out.txt", "w")
+raw_file = open(path_xilinx + "lidar_raw_data.txt", "w")
+obj_file = open(path_xilinx + "obj_data.txt", "w")
 
 _=input("write")
 
@@ -56,7 +56,7 @@ while time.time() < t_end:
         # # Write video frame to file
         frames.append(frame)
 
-        # Get LIDAR data
+        # # Get LIDAR data
         raw_data = lidar.get_scan()
         obj_data = lidar.get_obs_data()
 
@@ -89,7 +89,7 @@ for obj in objs:
     obj_string = ",".join([str(i) for i in obj])
     obj_file.write(obj_string + "\n")
 
-# # Close files
+# Close files
 print("Closing all files")
 video_file.close()
 raw_file.close()

@@ -164,7 +164,7 @@ def compareColor(compression=False):
             _ = showVideo.getFrameBitToInt(frame)
         
         # Get time to have frame ready + sending time
-        times[0][i] = (time.time() - t_start) / iterations + timeSend / iterations
+        times[0][i] = (time.time() - t_start) / iterations # + timeSend / iterations
         avgShape[0][i] = avgShape[0][i]/iterations
     
     # Change to 4bit color
@@ -193,7 +193,7 @@ def compareColor(compression=False):
 
         
         # Get the average time
-        times[1][i] = (time.time() - t_start) / iterations + timeSend / iterations
+        times[1][i] = (time.time() - t_start) / iterations # + timeSend / iterations
         avgShape[1][i] = avgShape[1][i]/iterations
 
     # Plot the different data sets
@@ -386,7 +386,7 @@ def testCompression():
     print('Check if Non Updated Matrix works: ' + str(np.all(nonUpdated == nonUpdatedManual)))
 
 if __name__ == '__main__':
-    # comparePseudoCompression(color="8bit")
+    comparePseudoCompression(color="4bit")
     # compareColor(compression=False)
-    doesPseudoCompressionWork(color="8bit", compression=True)
+    # doesPseudoCompressionWork(color="4bit", compression=True)
     # testCompression()

@@ -24,7 +24,7 @@ def show_video():
     lines = video_file.readlines()
 
     # Get decompressor
-    showVideo = ShowVideo(color="4bit", compression=False)
+    showVideo = ShowVideo(color="8bit", compression=False)
 
     print('Formatting data to be displayed')
     frames = []
@@ -52,7 +52,7 @@ def show_video():
         # Show video
         cv2.imshow('TracSat', frame)
 
-        time.sleep(0.08)
+        time.sleep(0.5)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

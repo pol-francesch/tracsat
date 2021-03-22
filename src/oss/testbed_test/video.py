@@ -63,26 +63,52 @@ class Video:
     def getFrameBitCompressed(self):
         frame = self.getFrame()
 
-        # First check if this is the first frame
-        if type(self.oldFrame) is bool:
+        if self.color == '8bit':
+            # First check if this is the first frame
+            if type(self.oldFrame) is bool:
+                self.oldFrame = frame
+                return np.concatenate(([0], np.unpackbits(frame)))
+            
+            # Compress
+            dummy = np.where(frame==0, 1, frame)
+            updateMatrix = ~np.equal(dummy, self.oldFrame)*1
+            updatePixels = np.multiply(dummy, updateMatrix).flatten()
+            updateMatrix = updateMatrix.flatten()
+            updatePixels = updatePixels[updatePixels != 0].astype(np.uint8)
+            updateBits = np.unpackbits(updatePixels)
+
+            bigDaddy = np.concatenate((updateMatrix, updateBits))
             self.oldFrame = frame
-            return np.concatenate(([0], binary_repr(frame)))
-        
-        # Compress
-        dummy = np.where(frame==0, 1, frame)
-        updateMatrix = ~np.equal(dummy, self.oldFrame)*1
-        updatePixels = np.multiply(dummy, updateMatrix).flatten()
-        updateMatrix = updateMatrix.flatten()
-        updatePixels = updatePixels[updatePixels != 0].astype(np.uint8)
-        updateBits = np.unpackbits(updatePixels)
 
-        bigDaddy = np.concatenate((updateMatrix, updateBits))
-        self.oldFrame = frame
+            # Check which is smaller
+            send = np.concatenate(([1],bigDaddy)) if bigDaddy.shape[0] < frame.shape[0]*frame.shape[1]*8 else np.concatenate(([0],np.unpackbits(frame)))
 
-        # Check which is smaller
-        send = np.concatenate(([1],bigDaddy)) if bigDaddy.shape[0] < frame.shape[0]*frame.shape[1]*8 else np.concatenate(([0],np.unpackbits(frame)))
+            return send
 
-        return send        
+        elif self.color == '4bit':
+            # Change to 4bit
+            frame = np.vstack(((frame - np.remainder(frame, 16))/16).astype(np.uint8).flatten())
+
+            # First check if this is the first frame
+            if type(self.oldFrame) is bool:
+                self.oldFrame = frame
+                ret = np.concatenate(([0], np.unpackbits(frame, axis=-1, bitorder='little', count=4).flatten()))
+                return ret
+            
+            # Compress
+            dummy = np.where(frame==0, 1, frame)
+            updateMatrix = ~np.equal(dummy, self.oldFrame)*1
+            updatePixels = np.multiply(dummy, updateMatrix).flatten()
+            updateMatrix = updateMatrix.flatten()
+            updatePixels = np.vstack(updatePixels[updatePixels != 0].astype(np.uint8).flatten())
+            updateBits = np.unpackbits(updatePixels, axis=-1, bitorder='little', count=4).flatten()
+            bigDaddy = np.concatenate((updateMatrix, updateBits))
+            self.oldFrame = frame
+
+            # Check which is smaller
+            send = np.concatenate(([1],bigDaddy)) if bigDaddy.shape[0] < frame.shape[0]*frame.shape[1]*8 else np.concatenate(([0],np.unpackbits(frame, axis=-1, bitorder='little', count=4).flatten()))
+
+            return send
 
     def __del__(self):
         self.cap.release()
@@ -124,36 +150,70 @@ class ShowVideo:
             
             return np.packbits(frame_bits).reshape((self.dim[1], self.dim[0]))
         else:
-            # Check if we sent the compressed version
-            if frame_bits[0] == 0 or type(self.oldFrame) is bool:
-                frame = np.packbits(frame_bits[1:]).reshape((self.dim[1], self.dim[0]))
-                self.oldFrame = frame
-                return frame
-            else:
-                # Unpack the input
-                updateMatrix = frame_bits[1:self.dim[0]*self.dim[1]+1]
-                updatePixels = np.packbits(frame_bits[self.dim[0]*self.dim[1]+1:])
+            if self.color == '8bit':
+                # Check if we sent the compressed version
+                if frame_bits[0] == 0 or type(self.oldFrame) is bool:
+                    frame = np.packbits(frame_bits[1:]).reshape((self.dim[1], self.dim[0]))
+                    self.oldFrame = frame
+                    return frame
+                else:
+                    # Unpack the input
+                    updateMatrix = frame_bits[1:self.dim[0]*self.dim[1]+1]
+                    updatePixels = np.packbits(frame_bits[self.dim[0]*self.dim[1]+1:])
 
-                # Convert to int
-                updateMatrixInt = np.zeros((self.dim[0]*self.dim[1],1))
-                countb = 0
-                
-                for i in range(self.dim[0]*self.dim[1]):
-                    if updateMatrix[i] == 1:
-                        updateMatrixInt[i] = updatePixels[countb]
-                        countb += 1
-                
-                updateMatrixInt = updateMatrixInt.flatten().astype(np.uint8).reshape((self.dim[1], self.dim[0]))
+                    # Convert to int
+                    updateMatrixInt = np.zeros((self.dim[0]*self.dim[1],1))
+                    countb = 0
+                    
+                    for i in range(self.dim[0]*self.dim[1]):
+                        if updateMatrix[i] == 1:
+                            updateMatrixInt[i] = updatePixels[countb]
+                            countb += 1
+                    
+                    updateMatrixInt = updateMatrixInt.flatten().astype(np.uint8).reshape((self.dim[1], self.dim[0]))
 
-                # Get the non-updated old frame
-                nonUpdateMatrix = np.where(updateMatrix == 1, 0, 1)
-                nonUpdated = np.multiply(nonUpdateMatrix.reshape((self.dim[1], self.dim[0])), self.oldFrame)
+                    # Get the non-updated old frame
+                    nonUpdateMatrix = np.where(updateMatrix == 1, 0, 1)
+                    nonUpdated = np.multiply(nonUpdateMatrix.reshape((self.dim[1], self.dim[0])), self.oldFrame)
 
-                # Return output
-                ret = np.asarray(updateMatrixInt + nonUpdated, dtype=np.uint8)
-                self.oldFrame = ret
+                    # Return output
+                    ret = np.asarray(updateMatrixInt + nonUpdated, dtype=np.uint8)
+                    self.oldFrame = ret
 
-                return ret
+                    return ret
+            elif self.color == '4bit':
+                # Check if we sent the compressed version
+                if frame_bits[0] == 0 or type(self.oldFrame) is bool:
+                    frame = frame_bits[1:].reshape((self.dim[0]*self.dim[1], 4))
+                    gray = 16*np.packbits(frame, axis=-1, bitorder='little').reshape((self.dim[1], self.dim[0]))
+                    self.oldFrame = gray
+                    return gray
+                else:
+                    # Unpack the input
+                    updateMatrix = frame_bits[1:self.dim[0]*self.dim[1]+1]
+                    frame = frame_bits[self.dim[0]*self.dim[1]+1:].reshape((-1, 4))
+                    updatePixels = 16*np.packbits(frame, axis=-1, bitorder='little')
+
+                    # Convert to int
+                    updateMatrixInt = np.zeros((self.dim[0]*self.dim[1],1))
+                    countb = 0
+                    
+                    for i in range(self.dim[0]*self.dim[1]):
+                        if updateMatrix[i] == 1:
+                            updateMatrixInt[i] = updatePixels[countb]
+                            countb += 1
+                    
+                    updateMatrixInt = updateMatrixInt.flatten().astype(np.uint8).reshape((self.dim[1], self.dim[0]))
+
+                    # Get the non-updated old frame
+                    nonUpdateMatrix = np.where(updateMatrix == 1, 0, 1)
+                    nonUpdated = np.multiply(nonUpdateMatrix.reshape((self.dim[1], self.dim[0])), self.oldFrame)
+
+                    # Return output
+                    ret = np.asarray(updateMatrixInt + nonUpdated, dtype=np.uint8)
+                    self.oldFrame = ret
+
+                    return ret
         
     def setDim(self, dim):
         self.dim = dim
@@ -165,13 +225,11 @@ class ShowVideo:
         self.oldFrame = False
 
 if __name__ == '__main__':
-    video = Video(color='8bit')
-    frame8 = video.getFrameBitsFast()
-    print(frame8.shape)
-    print(frame8[0:16])
+    video = Video(color='4bit')
+    showVideo = ShowVideo(color='4bit', compression=True)
+    frame_bits = video.getFrameBitCompressed()
+    gray       = showVideo.getFrameBitToInt(frame_bits)
+    print('passed')
 
-    video.setColor('4bit')
-    frame4 = video.getFrameBitsFast()
-    print(frame4.shape)
-    print(frame4[0:16])
-    # print(frame)
+    frame_bits2 = video.getFrameBitCompressed()
+    gray2       = showVideo.getFrameBitToInt(frame_bits2)
