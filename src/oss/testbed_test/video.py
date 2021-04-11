@@ -225,8 +225,8 @@ class ShowVideo:
         self.oldFrame = False
 
 if __name__ == '__main__':
-    video = Video(color='4bit')
-    showVideo = ShowVideo(color='4bit', compression=True)
+    video = Video(color='8bit')
+    showVideo = ShowVideo(color='8bit', compression=True)
     frame_bits = video.getFrameBitCompressed()
     gray       = showVideo.getFrameBitToInt(frame_bits)
     print('passed')
