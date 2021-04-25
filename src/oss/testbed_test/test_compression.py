@@ -96,7 +96,7 @@ def comparePseudoCompression(color="8bit"):
             avgShape[0][i] = avgShape[0][i] + frame.shape[0]
 
             # Decompression
-            _ = showVideoNo.getFrameBitToInt(frame)
+            # _ = showVideoNo.getFrameBitToInt(frame)
         
         # Get time to have frame ready + sending time
         times[0][i] = (time.time() - t_start) / iterations + timeSend / iterations
@@ -117,7 +117,7 @@ def comparePseudoCompression(color="8bit"):
             avgShape[1][i] = avgShape[1][i] + frame.shape[0]
 
             # Decompression
-            _ = showVideo.getFrameBitToInt(frame)
+            # _ = showVideo.getFrameBitToInt(frame)
 
         
         # Get the average time
