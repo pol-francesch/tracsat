@@ -92,14 +92,14 @@ def comparePseudoCompression(color="8bit"):
             frame = video.getFrameBitsFast()
 
             # Need to add in sending time here
-            timeSend = timeSend + frame.shape[0]/laserBaud
+            # timeSend = timeSend + frame.shape[0]/laserBaud
             avgShape[0][i] = avgShape[0][i] + frame.shape[0]
 
             # Decompression
             # _ = showVideoNo.getFrameBitToInt(frame)
         
         # Get time to have frame ready + sending time
-        times[0][i] = (time.time() - t_start) / iterations + timeSend / iterations
+        times[0][i] = (time.time() - t_start) / iterations # + timeSend / iterations
         avgShape[0][i] = avgShape[0][i]/iterations
     
     # Next run the compressed video time
@@ -113,7 +113,7 @@ def comparePseudoCompression(color="8bit"):
             frame = video.getFrameBitCompressed()
 
             # Need to add in sending time here
-            timeSend = timeSend + frame.shape[0]/laserBaud
+            # timeSend = timeSend + frame.shape[0]/laserBaud
             avgShape[1][i] = avgShape[1][i] + frame.shape[0]
 
             # Decompression
@@ -121,7 +121,7 @@ def comparePseudoCompression(color="8bit"):
 
         
         # Get the average time
-        times[1][i] = (time.time() - t_start) / iterations + timeSend / iterations
+        times[1][i] = (time.time() - t_start) / iterations # + timeSend / iterations
         avgShape[1][i] = avgShape[1][i]/iterations
 
     # Plot the different data sets
