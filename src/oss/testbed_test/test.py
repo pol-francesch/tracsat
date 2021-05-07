@@ -21,17 +21,27 @@ video = Video()
 compression = False
 color = "8bit"
 dim = (640,480)
+addtl = "_no_8bit"
 
 video.setColor(color)
 video.setDim(dim)
 
 # Initialize file writing
-# /home/polfr/Documents/PurdueTracSat/tracsat/src/oss/testbed_test/data/video_out.txt
+source = input('Type 0 for PYNQ. Type 1 for Pol\'s PC: ')
 path_xilinx = "/home/xilinx/tracsat/src/oss/testbed_test/data/"
 path_pc = "/home/polfr/Documents/tracsat/src/oss/testbed_test/data/"
-video_file = open(path_xilinx + "video_outp.txt", "w")
-raw_file = open(path_xilinx + "lidar_raw_datap.txt", "w")
-obj_file = open(path_xilinx + "obj_datap.txt", "w")
+
+if source == '0':
+    path = path_xilinx
+elif source == '1':
+    path = path_pc
+else:
+    print('That is not an option!')
+    exit(0)
+
+video_file = open(path + "video_out" + addtl + ".txt", "w")
+raw_file = open(path + "lidar_raw" + addtl + ".txt", "w")
+obj_file = open(path + "obj_data" + addtl + ".txt", "w")
 
 _=input("write")
 
@@ -53,7 +63,7 @@ while time.time() < t_end:
         else:
             frame = video.getFrameBitsFast()
 
-        # # Write video frame to file
+        # Write video frame to file
         frames.append(frame)
 
         # Get LIDAR data
@@ -89,7 +99,7 @@ for obj in objs:
     obj_string = ",".join([str(i) for i in obj])
     obj_file.write(obj_string + "\n")
 
-# # Close files
+# Close files
 print("Closing all files")
 video_file.close()
 raw_file.close()

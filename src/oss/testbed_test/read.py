@@ -1,5 +1,6 @@
 import numpy as np
 import time
+from math import floor
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from cv2 import cv2
@@ -17,14 +18,14 @@ raw_file = open(path_pc + "lidar_raw_data.txt", "r")
 obj_file = open(path_pc + "obj_data.txt", "r")
 
 # Show video from data
-cap = cv2.VideoCapture(0)
+# cap = cv2.VideoCapture(0)
 
 def show_video():
     # Get data
     lines = video_file.readlines()
 
     # Get decompressor
-    showVideo = ShowVideo(color="4bit", compression=False)
+    showVideo = ShowVideo(color="8bit", compression=False)
 
     print('Formatting data to be displayed')
     frames = []
@@ -52,13 +53,110 @@ def show_video():
         # Show video
         cv2.imshow('TracSat', frame)
 
-        time.sleep(0.08)
+        time.sleep(0.5)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     
     print(len(frames))
     cap.release()
+    cv2.destroyAllWindows()
+
+def show_many_video():
+    # Get files
+    path_xilinx = "/home/xilinx/tracsat/src/oss/testbed_test/data/"
+    path_pc = "/home/polfr/Documents/tracsat/src/oss/testbed_test/data/"
+    video_8_no = open(path_pc + "video_out_8_no.txt", "r")
+    video_8_yes = open(path_pc + "video_out_8_yes.txt", "r")
+    video_4_no = open(path_pc + "video_out_4_no.txt", "r")
+    video_4_yes = open(path_pc + "video_out_4_yes.txt", "r")
+
+    # Get data
+    lines_8_no = video_8_no.readlines()
+    lines_8_yes = video_8_yes.readlines()
+    lines_4_no = video_4_no.readlines()
+    lines_4_yes = video_4_yes.readlines()
+
+    # Get decompressor
+    showVideo = ShowVideo(color="8bit", compression=False)
+
+    print('Formatting data to be displayed')
+    frames_8_no = []
+    frames_8_yes = []
+    frames_4_no = []
+    frames_4_yes = []
+    
+    for i in tqdm(range(0,len(lines_8_no))):
+        line = lines_8_no[i]
+
+        data = [int(bit) for bit in line.split(',')]
+
+        gray = showVideo.getFrameBitToInt(np.asarray(data))
+        frames_8_no.append(gray)
+    
+    showVideo.compression = True
+    
+    for i in tqdm(range(0,len(lines_8_yes))):
+        line = lines_8_yes[i]
+
+        data = [int(bit) for bit in line.split(',')]
+
+        gray = showVideo.getFrameBitToInt(np.asarray(data))
+        frames_8_yes.append(gray)
+    
+    showVideo.compression = False
+    showVideo.setColor('4bit')
+    
+    for i in tqdm(range(0,len(lines_4_no))):
+        line = lines_4_no[i]
+
+        data = [int(bit) for bit in line.split(',')]
+
+        gray = showVideo.getFrameBitToInt(np.asarray(data))
+        frames_4_no.append(gray)
+    
+    showVideo.compression = True
+    
+    for i in tqdm(range(0,len(lines_4_yes))):
+        line = lines_4_yes[i]
+
+        data = [int(bit) for bit in line.split(',')]
+
+        gray = showVideo.getFrameBitToInt(np.asarray(data))
+        frames_4_yes.append(gray)
+    
+    # Splice the image files together
+    frames = []
+    size_4_no = len(frames_4_no)/len(frames_8_yes)
+    size_4_yes = len(frames_4_yes)/len(frames_8_yes)
+    print(size_4_no)
+    print(size_4_yes)
+
+    for i  in tqdm(range(0,len(lines_8_yes))):
+        k = int(floor(i*size_4_no))
+        j = int(floor(i*size_4_yes))
+
+        frames.append(np.vstack((np.hstack((frames_8_no[i], frames_8_yes[i])),np.hstack((frames_4_no[k], frames_4_yes[j])))))
+
+
+    # Wait for input
+    cv2.namedWindow("TracSat", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("TracSat", 640*2, 480*2)
+    _ = input("Press any key to show video!")
+
+    print("Showing video")
+
+    # Iterate through frames and show one by one
+    for frame in frames:
+        # Show frame
+        cv2.imshow('TracSat', frame)
+
+        time.sleep(0.08)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    
+    print(len(frames))
     cv2.destroyAllWindows()
 
 # Show animation of lidar from data
@@ -128,7 +226,7 @@ def show_obs():
 # Main control
 if __name__ == '__main__':
     # Run code for video
-    show_video()
+    show_many_video()
 
     # Run code for LIDAR raw data
     # show_raw_data()

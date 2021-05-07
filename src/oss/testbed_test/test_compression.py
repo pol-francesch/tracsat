@@ -1,5 +1,5 @@
 import numpy as np 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from cv2 import cv2
 import sys
 
@@ -34,32 +34,33 @@ def compression_time(imageSize, laserBaud, compressionFixed, compressionVariable
 
     return totalTime
 
+
 # Will try to see how image characteristics affect the total time from capturing frame to being ready to show it
-def compareImageAndUpdate():
-    # Set up givens
-    laserBaud = 50000
-    compressionFixed = 0.5
-    compressionVariable = 1e-30
+# def compareImageAndUpdate():
+#     # Set up givens
+#     laserBaud = 50000
+#     compressionFixed = 0.5
+#     compressionVariable = 1e-30
 
-    # Set up arrays
-    imageSizes   = [(640, 480), (480, 360), (320, 240), (160, 120)]
-    updateValues = np.linspace(0.0, 1.0, num=100, endpoint=True)
-    compressionTimes = np.zeros((4, 100))
+#     # Set up arrays
+#     imageSizes   = [(640, 480), (480, 360), (320, 240), (160, 120)]
+#     updateValues = np.linspace(0.0, 1.0, num=100, endpoint=True)
+#     compressionTimes = np.zeros((4, 100))
 
-    # Get values
-    for imageSize, i in zip(imageSizes, range(4)):
-        for updateValue, j in zip(updateValues, range(100)):
-            compressionTimes[i][j] = compression_time(imageSize, laserBaud, compressionFixed, compressionVariable, updateValue)
+#     # Get values
+#     for imageSize, i in zip(imageSizes, range(4)):
+#         for updateValue, j in zip(updateValues, range(100)):
+#             compressionTimes[i][j] = compression_time(imageSize, laserBaud, compressionFixed, compressionVariable, updateValue)
 
-    # Plot the different shapes
-    for i in range(4):
-        plt.plot(updateValues, compressionTimes[i], label=str(imageSizes[i]))
+#     # Plot the different shapes
+#     for i in range(4):
+#         plt.plot(updateValues, compressionTimes[i], label=str(imageSizes[i]))
     
-    plt.legend(fontsize=14)
-    plt.xlabel('Pixels that Need to be Updated / Total Number of Pixels', fontsize=16)
-    plt.ylabel('Amount of Time to Capture Frame and be Ready to Show at GS (s)', fontsize=16)
-    plt.title('How does a Videos\' Characteristics Affect the Time to Show it at the Ground Station?', fontsize=18)
-    plt.show()
+#     plt.legend(fontsize=14)
+#     plt.xlabel('Pixels that Need to be Updated / Total Number of Pixels', fontsize=16)
+#     plt.ylabel('Amount of Time to Capture Frame and be Ready to Show at GS (s)', fontsize=16)
+#     plt.title('How does a Videos\' Characteristics Affect the Time to Show it at the Ground Station?', fontsize=18)
+#     plt.show()
 
 # This will compare the initial compression time (so at the TracSat) between normal sending and compression
 # Let us assume that sampling the time takes the same amount of time, so the relationship will be linear in nature
@@ -91,14 +92,14 @@ def comparePseudoCompression(color="8bit"):
             frame = video.getFrameBitsFast()
 
             # Need to add in sending time here
-            timeSend = timeSend + frame.shape[0]/laserBaud
+            # timeSend = timeSend + frame.shape[0]/laserBaud
             avgShape[0][i] = avgShape[0][i] + frame.shape[0]
 
             # Decompression
-            _ = showVideoNo.getFrameBitToInt(frame)
+            # _ = showVideoNo.getFrameBitToInt(frame)
         
         # Get time to have frame ready + sending time
-        times[0][i] = (time.time() - t_start) / iterations + timeSend / iterations
+        times[0][i] = (time.time() - t_start) / iterations # + timeSend / iterations
         avgShape[0][i] = avgShape[0][i]/iterations
     
     # Next run the compressed video time
@@ -112,15 +113,15 @@ def comparePseudoCompression(color="8bit"):
             frame = video.getFrameBitCompressed()
 
             # Need to add in sending time here
-            timeSend = timeSend + frame.shape[0]/laserBaud
+            # timeSend = timeSend + frame.shape[0]/laserBaud
             avgShape[1][i] = avgShape[1][i] + frame.shape[0]
 
             # Decompression
-            _ = showVideo.getFrameBitToInt(frame)
+            # _ = showVideo.getFrameBitToInt(frame)
 
         
         # Get the average time
-        times[1][i] = (time.time() - t_start) / iterations + timeSend / iterations
+        times[1][i] = (time.time() - t_start) / iterations # + timeSend / iterations
         avgShape[1][i] = avgShape[1][i]/iterations
 
     # Plot the different data sets
@@ -164,7 +165,7 @@ def compareColor(compression=False):
             _ = showVideo.getFrameBitToInt(frame)
         
         # Get time to have frame ready + sending time
-        times[0][i] = (time.time() - t_start) / iterations + timeSend / iterations
+        times[0][i] = (time.time() - t_start) / iterations # + timeSend / iterations
         avgShape[0][i] = avgShape[0][i]/iterations
     
     # Change to 4bit color
@@ -193,7 +194,7 @@ def compareColor(compression=False):
 
         
         # Get the average time
-        times[1][i] = (time.time() - t_start) / iterations + timeSend / iterations
+        times[1][i] = (time.time() - t_start) / iterations # + timeSend / iterations
         avgShape[1][i] = avgShape[1][i]/iterations
 
     # Plot the different data sets
@@ -260,7 +261,12 @@ def doesPseudoCompressionWork(color='8bit', compression=False):
             gray = showVideo.getFrameBitToInt(frame_bits)
 
             # Display the resulting frame
-            cv2.imshow('TracSat', gray)
+            # cv2.imshow('TracSat', gray)
+
+            image = cv2.putText(gray, '60', (50,50), cv2.FONT_HERSHEY_COMPLEX, 
+                        1, (255,0,0), 2, cv2.LINE_AA)
+            
+            cv2.imshow('TracSat', image)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -381,7 +387,7 @@ def testCompression():
     print('Check if Non Updated Matrix works: ' + str(np.all(nonUpdated == nonUpdatedManual)))
 
 if __name__ == '__main__':
-    # comparePseudoCompression(color="8bit")
+    comparePseudoCompression(color="4bit")
     # compareColor(compression=False)
-    doesPseudoCompressionWork(color="8bit", compression=True)
+    # doesPseudoCompressionWork(color="4bit", compression=True)
     # testCompression()
