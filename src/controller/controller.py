@@ -1,5 +1,4 @@
 from scipy.ndimage import gaussian_filter1d
-import matplotlib.pyplot as plt
 import numpy as np
 import math
 import time
@@ -109,7 +108,7 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
     if phi < 0:
         phi += 2*math.pi
 
-    waypointDist = math.sqrt(((yW[endWaypoint]-yW[startWaypoint])^2+(xW[endWaypoint]-xW[startWaypoint])^2)) #distance between checkpoints
+    waypointDist = math.sqrt(((yW[endWaypoint]-yW[startWaypoint])**2+(xW[endWaypoint]-xW[startWaypoint])**2)) #distance between checkpoints
 
     #get euler angle
     accX, accY, accZ = sensor.linear_acceleration
@@ -163,8 +162,8 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
         thrusters[5] = 1
 
     if errorS < .5 * waypointDist: #go to next checkpoint pair if tracsat has moved halway through current checkpoint pair
-        waypointEdges[0] += 1
-        waypointEdges[1] += 1
+        waypointEdges[0] += 0
+        waypointEdges[1] += 0
 
     integrals[0] = integralS
     integrals[1] = integralR
@@ -192,7 +191,7 @@ def updateKinematics(currentX,currentY,currentVx,currentVy,euler1,accX,accY,t0,t
     newVy = currentVy + accYI * (t1-t0)
 
     #approximate new position
-    newX = currentX + currentVx * (t1-t0) + .5 * accXI * (t1-t0)^2
-    newY = currentY + currentVy * (t1-t0) + .5 * accYI * (t1-t0)^2
+    newX = currentX + currentVx * (t1-t0) + .5 * accXI * (t1-t0)**2
+    newY = currentY + currentVy * (t1-t0) + .5 * accYI * (t1-t0)**2
 
     return newX,newY,newVx,newVy

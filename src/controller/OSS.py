@@ -1,5 +1,4 @@
 from scipy.ndimage import gaussian_filter1d
-import matplotlib.pyplot as plt
 import numpy as np
 import math
 import time
@@ -12,14 +11,13 @@ import RPi.GPIO as GPIO
 i2c = busio.I2C(board.SCL, board.SDA)
 sensor = adafruit_bno055.BNO055_I2C(i2c)
 
-GPIO.setmode(GPIO.BOARD)
 
-posX = 11
-negX = 13
-posY = 19
-negY = 21
-posZ = 29
-negZ = 31
+posX = 17
+negX = 27
+posY = 10
+negY = 9
+posZ = 5
+negZ = 6
 
 GPIO.setup(posX, GPIO.OUT)
 GPIO.setup(negX, GPIO.OUT)
@@ -56,7 +54,7 @@ phi = math.atan2((yW[endWaypoint]-yW[startWaypoint]),(xW[endWaypoint]-xW[startWa
 if phi < 0:
     phi += 2*math.pi
 
-waypointDist = math.sqrt(((yW[endWaypoint]-yW[startWaypoint])^2+(xW[endWaypoint]-xW[startWaypoint])^2)) #distance between waypoints
+waypointDist = math.sqrt(((yW[endWaypoint]-yW[startWaypoint])**2+(xW[endWaypoint]-xW[startWaypoint])**2)) #distance between waypoints
 
 t0 = time.time()
 
@@ -93,7 +91,7 @@ waypointEdges = np.array([startWaypoint,endWaypoint])
 thrusters = np.zeros(6)
 
 while True:
-    thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0 = controller.pid(objectPos,satPos,satVel,integrals,gains,prevErrors,wX,wY,waypointEdges,t0,sensor)
+    thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0 = controller.pid(objectPos,satPos,satVel,integrals,gains,prevErrors,xW,yW,waypointEdges,t0,sensor)
 
     if thrusters[0] == 1:
         GPIO.output(posX, GPIO.HIGH)
