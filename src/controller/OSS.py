@@ -28,6 +28,13 @@ GPIO.setup(negY, GPIO.OUT)
 GPIO.setup(posZ, GPIO.OUT)
 GPIO.setup(negZ, GPIO.OUT)
 
+GPIO.output(posX, GPIO.LOW)
+GPIO.output(negX, GPIO.LOW)
+GPIO.output(posY, GPIO.LOW)
+GPIO.output(negY, GPIO.LOW)
+GPIO.output(posZ, GPIO.LOW)
+GPIO.output(negZ, GPIO.LOW)
+
 #PATH PLANNING AND OBJECT FINDING HERE
 
 #position of object relative to s/c, assume we have from lidar
