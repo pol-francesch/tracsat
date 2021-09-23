@@ -33,15 +33,19 @@ GPIO.output(negY, GPIO.LOW)
 GPIO.output(posZ, GPIO.LOW)
 GPIO.output(negZ, GPIO.LOW)
 
+fileName = "log_" + str(round(time.time())) + ".txt"
+
+f = open(fileName,"w")
+
 #PATH PLANNING AND OBJECT FINDING HERE
 
 #position of object relative to s/c, assume we have from lidar
-objectX = .5/2
-objectY = .5/2
+objectX = .5
+objectY = .5
 
 #points along path from path planning, assume x is in general direction from tracSat starting point to object
-x = np.array([0, .125, .25, .375, .5])
-y = np.array([0, 0, 0, 0, 0])
+x = np.array([0,1])
+y = np.array([0,0])
 
 curvatureThreshold = 13
 
@@ -76,22 +80,25 @@ if rT < 0:
     rT += math.pi*2
 errorT = rT - euler1 #rotation error
 
+thrusters = np.zeros(6)
+
+f.write("%t0, xPos, yPos, xVel, yVel, accX, accY, euler1, errorS, errorR, errorT, thruster1, thruster2, thruster3, thruster4, thruster5, thruster6, uS, uR, uT\n")
+f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thruster[0],thruster[1],thruster[2],thruster[3],thruster[4],thruster[5],0,0,0))
+
 objectPos = np.array([objectX, objectY])
 satPos = np.array([xPos,yPos])
 satVel = np.array([xVel,yVel])
 
 integrals = np.array([0,0,0])
 
-gains = np.array([[10,.1,1],[10,.1,1],[10,.1,1]]) #[[KpS,KdS,KiS],[KpR,KdR,KiR],[KpT,KdT,KiT]]
+gains = np.array([[10,1,.1],[10,1,.1],[10,1,.1]]) #[[KpS,KdS,KiS],[KpR,KdR,KiR],[KpT,KdT,KiT]]
 
 prevErrors = np.array([errorS,errorR,errorT])
 
 waypointEdges = np.array([startWaypoint,endWaypoint])
 
-thrusters = np.zeros(6)
-
 while True:
-    thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0 = controller.pid(objectPos,satPos,satVel,integrals,gains,prevErrors,xW,yW,waypointEdges,t0,sensor)
+    thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0 = controller.pid(objectPos,satPos,satVel,integrals,gains,prevErrors,wX,wY,waypointEdges,t0,sensor,f)
 
     if thrusters[0] == 1:
         GPIO.output(posX, GPIO.HIGH)
