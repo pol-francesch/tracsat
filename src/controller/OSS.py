@@ -35,8 +35,8 @@ objectX = .5/2
 objectY = .5/2
 
 #points along path from path planning, assume x is in general direction from tracSat starting point to object
-x = [0 .25 .5 .75 1]/2
-y = [0 0 0 0 0]
+x = np.array([0, .125, .25, .375, .5])
+y = np.array([0, 0, 0, 0, 0])
 
 curvatureThreshold = 13
 
@@ -77,7 +77,7 @@ satVel = np.array([xVel,yVel])
 
 integrals = np.array([0,0,0])
 
-gains = np.array([[10,1,0.1],[10,1,0.1],[10,1,0.1]]) #[[KpS,KdS,KiS],[KpR,KdR,KiR],[KpT,KdT,KiT]]
+gains = np.array([[10,.1,1],[10,.1,1],[10,.1,1]]) #[[KpS,KdS,KiS],[KpR,KdR,KiR],[KpT,KdT,KiT]]
 
 prevErrors = np.array([errorS,errorR,errorT])
 

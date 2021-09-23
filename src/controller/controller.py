@@ -61,8 +61,6 @@ def getWaypoints(x,y,threshold):
 
     xW = np.append(xW, x[-1]) #adds last path point to waypoints
     yW = np.append(yW, y[-1])
-    xW = np.append(xW, 0) #adds zero again to close out the path
-    yW = np.append(yW, 0)
 
     return xW,yW
 
