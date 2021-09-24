@@ -93,36 +93,6 @@ gains = np.array([[10,1,.1],[10,1,.1],[10,1,.1]]) #[[KpS,KdS,KiS],[KpR,KdR,KiR],
 prevErrors = np.array([errorS,errorR,errorT])
 
 waypointEdges = np.array([startWaypoint,endWaypoint])
-<<<<<<< HEAD
-startTime = time.time()
-while time.time()-startTime<60.0:
-    thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0 = controller.pid(objectPos,satPos,satVel,integrals,gains,prevErrors,xW, yW,waypointEdges,t0,sensor,f)
-
-    if thrusters[0] == 1:
-        GPIO.output(posX, GPIO.HIGH)
-    else:
-        GPIO.output(posX, GPIO.LOW)
-    if thrusters[1] == 1:
-        GPIO.output(negX, GPIO.HIGH)
-    else:
-        GPIO.output(negX, GPIO.LOW)
-    if thrusters[2] == 1:
-        GPIO.output(posY, GPIO.HIGH)
-    else:
-        GPIO.output(posY, GPIO.LOW)
-    if thrusters[3] == 1:
-        GPIO.output(negY, GPIO.HIGH)
-    else:
-        GPIO.output(negY, GPIO.LOW)
-    if thrusters[4] == 1:
-        GPIO.output(posZ, GPIO.HIGH)
-    else:
-        GPIO.output(posZ, GPIO.LOW)
-    if thrusters[5] == 1:
-        GPIO.output(negZ, GPIO.HIGH)
-    else:
-        GPIO.output(negZ, GPIO.LOW)
-=======
 
 while True:
     thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0 = controller.pid(objectPos,satPos,satVel,integrals,gains,prevErrors,xW,yW,waypointEdges,t0,sensor,fileName)
@@ -132,7 +102,6 @@ while True:
             GPIO.output(directionPins[j], GPIO.HIGH)
         else:
             GPIO.output(directionPins[j], GPIO.LOW)
->>>>>>> 712cde716235f3d18d8f0932c8ca09755ed037d7
 
     time.sleep(.05) #wait for solenoids to fully open/close
 f.close()
