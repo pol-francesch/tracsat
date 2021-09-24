@@ -83,7 +83,7 @@ errorT = rT - euler1 #rotation error
 thrusters = np.zeros(6)
 
 f.write("%t0, xPos, yPos, xVel, yVel, accX, accY, euler1, errorS, errorR, errorT, thruster1, thruster2, thruster3, thruster4, thruster5, thruster6, uS, uR, uT\n")
-f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thruster[0],thruster[1],thruster[2],thruster[3],thruster[4],thruster[5],0,0,0))
+f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5],0,0,0))
 
 objectPos = np.array([objectX, objectY])
 satPos = np.array([xPos,yPos])
@@ -96,9 +96,9 @@ gains = np.array([[10,1,.1],[10,1,.1],[10,1,.1]]) #[[KpS,KdS,KiS],[KpR,KdR,KiR],
 prevErrors = np.array([errorS,errorR,errorT])
 
 waypointEdges = np.array([startWaypoint,endWaypoint])
-
-while True:
-    thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0 = controller.pid(objectPos,satPos,satVel,integrals,gains,prevErrors,wX,wY,waypointEdges,t0,sensor,f)
+startTime = time.time()
+while time.time()-startTime<60.0:
+    thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0 = controller.pid(objectPos,satPos,satVel,integrals,gains,prevErrors,xW, yW,waypointEdges,t0,sensor,f)
 
     if thrusters[0] == 1:
         GPIO.output(posX, GPIO.HIGH)
@@ -125,4 +125,5 @@ while True:
     else:
         GPIO.output(negZ, GPIO.LOW)
 
-    time.sleep(.015) #wait for solenoids to fully open/close
+    time.sleep(.05) #wait for solenoids to fully open/close
+f.close()
