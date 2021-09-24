@@ -19,19 +19,11 @@ negY = 9
 posZ = 5
 negZ = 6
 
-GPIO.setup(posX, GPIO.OUT)
-GPIO.setup(negX, GPIO.OUT)
-GPIO.setup(posY, GPIO.OUT)
-GPIO.setup(negY, GPIO.OUT)
-GPIO.setup(posZ, GPIO.OUT)
-GPIO.setup(negZ, GPIO.OUT)
+directionPins = np.array([posX,negX,posY,negY,posZ,negZ])
 
-GPIO.output(posX, GPIO.LOW)
-GPIO.output(negX, GPIO.LOW)
-GPIO.output(posY, GPIO.LOW)
-GPIO.output(negY, GPIO.LOW)
-GPIO.output(posZ, GPIO.LOW)
-GPIO.output(negZ, GPIO.LOW)
+for j in range(0,6):
+    GPIO.setup(directionPins[j], GPIO.OUT)
+    GPIO.output(directionPins[j], GPIO.LOW)
 
 fileName = "log_" + str(round(time.time())) + ".txt"
 
@@ -68,22 +60,27 @@ euler1, euler2, euler3 = sensor.euler
 t1 = time.time()
 
 euler1 = euler1 * math.pi/180
+euler1 = 2 * math.pi - euler1
 
 xPos, yPos, xVel, yVel = controller.updateKinematics(0,0,0,0,euler1,accX,accY,t0,t1)
-
+temp = t0
 t0 = t1
 
-errorS = waypointDist - (math.cos(phi)*(xPos - xW[startWaypoint]) + math.cos(phi)*(yPos - yW[startWaypoint])) #error along path
+errorS = waypointDist - (math.cos(phi)*(xPos - xW[startWaypoint]) + math.sin(phi)*(yPos - yW[startWaypoint])) #error along path
 errorR = -math.sin(phi)*(xPos - xW[startWaypoint]) + math.cos(phi)*(yPos - yW[startWaypoint]) #error perpendicular to path
 rT = math.atan2((objectY - yPos),(objectX - xPos)) #rotation setpoint
 if rT < 0:
     rT += math.pi*2
+
+rT = 90*math.pi/180 #hardcoding orientation to see if it works
+
 errorT = rT - euler1 #rotation error
 
 thrusters = np.zeros(6)
 
-f.write("%t0, xPos, yPos, xVel, yVel, accX, accY, euler1, errorS, errorR, errorT, thruster1, thruster2, thruster3, thruster4, thruster5, thruster6, uS, uR, uT\n")
-f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5],0,0,0))
+f.write("%t0, t1, xPos, yPos, xVel, yVel, accX, accY, euler1, errorS, errorR, errorT, thruster1, thruster2, thruster3, thruster4, thruster5, thruster6, uS, uR, uT\n")
+f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(temp,t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5],0,0,0))
+f.close()
 
 objectPos = np.array([objectX, objectY])
 satPos = np.array([xPos,yPos])
@@ -96,6 +93,7 @@ gains = np.array([[10,1,.1],[10,1,.1],[10,1,.1]]) #[[KpS,KdS,KiS],[KpR,KdR,KiR],
 prevErrors = np.array([errorS,errorR,errorT])
 
 waypointEdges = np.array([startWaypoint,endWaypoint])
+<<<<<<< HEAD
 startTime = time.time()
 while time.time()-startTime<60.0:
     thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0 = controller.pid(objectPos,satPos,satVel,integrals,gains,prevErrors,xW, yW,waypointEdges,t0,sensor,f)
@@ -124,6 +122,17 @@ while time.time()-startTime<60.0:
         GPIO.output(negZ, GPIO.HIGH)
     else:
         GPIO.output(negZ, GPIO.LOW)
+=======
+
+while True:
+    thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0 = controller.pid(objectPos,satPos,satVel,integrals,gains,prevErrors,xW,yW,waypointEdges,t0,sensor,fileName)
+
+    for j in range(0,6):
+        if thrusters[j] == 1:
+            GPIO.output(directionPins[j], GPIO.HIGH)
+        else:
+            GPIO.output(directionPins[j], GPIO.LOW)
+>>>>>>> 712cde716235f3d18d8f0932c8ca09755ed037d7
 
     time.sleep(.05) #wait for solenoids to fully open/close
 f.close()

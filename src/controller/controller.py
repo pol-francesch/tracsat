@@ -63,7 +63,7 @@ def getWaypoints(x,y,threshold):
 
     return xW,yW
 
-def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY,waypointEdges,t0,sensor,f):
+def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY,waypointEdges,t0,sensor,fileName):
     thrusters = np.zeros(6) #number of thrusters, [+x,-x,+y,-y,+z,-z], 0 means off, 1 means on
 
     KpS = gains[0][0]
@@ -115,16 +115,20 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
     euler1, euler2, euler3 = sensor.euler
 
     euler1 = euler1 * math.pi/180
+    euler1 = 2*math.pi - euler1
 
     t1 = time.time()
 
     xPos, yPos, xVel, yVel = updateKinematics(xPos,yPos,xVel,yVel,euler1,accX,accY,t0,t1)
 
-    errorS = waypointDist - (math.cos(phi)*(xPos - xW[startWaypoint]) + math.cos(phi)*(yPos - yW[startWaypoint])) #error along path
+    errorS = waypointDist - (math.cos(phi)*(xPos - xW[startWaypoint]) + math.sin(phi)*(yPos - yW[startWaypoint])) #error along path
     errorR = -math.sin(phi)*(xPos - xW[startWaypoint]) + math.cos(phi)*(yPos - yW[startWaypoint]) #error perpendicular to path
     rT = math.atan2((objectY - yPos),(objectX - xPos)) #rotation setpoint
     if rT < 0:
         rT += math.pi*2
+
+    rT = 90*math.pi/180 #hardcoding orientation to see if it works
+
     errorT = rT - euler1 #rotation error
 
     #approximate all integrals
@@ -133,9 +137,11 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
     integralT += errorT * (t1-t0)
 
     #PID calculations
-    uS = errorS * KpS + integralS * KiS + (errorS - prevErrorS) / (t1-t0) * KdS
-    uR = errorR * KpR + integralR * KiR + (errorR - prevErrorR) / (t1-t0) * KdR
-    uT = errorT * KpT + integralT * KiT + (errorT - prevErrorT) / (t1-t0) * KdT
+    uS = errorS * KpS + integralS * KiS + (errorS - prevErrorS) * KdS / (t1-t0)
+    uR = errorR * KpR + integralR * KiR + (errorR - prevErrorR) * KdR / (t1-t0)
+    uT = errorT * KpT + integralT * KiT + (errorT - prevErrorT) * KdT / (t1-t0)
+
+    temp = t0
 
     t0 = t1
 
@@ -144,21 +150,21 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
     uY = -math.sin(euler1 - phi) * uS + math.cos(euler1 - phi) * uR
 
     #determine x thrusters
-    if uX > uTolerance:
+    if uX >= uTolerance:
         thrusters[0] = 1
-    elif uX < -uTolerance:
+    elif uX <= -uTolerance:
         thrusters[1] = 1
 
     #determine y thrusters
-    if uY > uTolerance:
+    if uY >= uTolerance:
         thrusters[2] = 1
-    elif uY < -uTolerance:
+    elif uY <= -uTolerance:
         thrusters[3] = 1
 
     #determine spin thrusters
-    if uT > uTolerance:
+    if uT >= uTolerance:
         thrusters[4] = 1
-    elif uT < -uTolerance:
+    elif uT <= -uTolerance:
         thrusters[5] = 1
 
     if errorS < .5 * waypointDist: #go to next checkpoint pair if tracsat has moved halway through current checkpoint pair
@@ -179,7 +185,9 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
     prevErrors[1] = errorR
     prevErrors[2] = errorT
 
-    f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5],uS,uR,uT))
+    f = open(fileName,"a")
+    f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(temp,t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5],uS,uR,uT))
+    f.close()
 
     return thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0
 
@@ -193,7 +201,7 @@ def updateKinematics(currentX,currentY,currentVx,currentVy,euler1,accX,accY,t0,t
     newVy = currentVy + accYI * (t1-t0)
 
     #approximate new position
-    newX = currentX + currentVx * (t1-t0) + .5 * accXI * (t1-t0)**2
-    newY = currentY + currentVy * (t1-t0) + .5 * accYI * (t1-t0)**2
+    newX = currentX + currentVx * (t1-t0) + .5 * accXI * (t1-t0) ** 2
+    newY = currentY + currentVy * (t1-t0) + .5 * accYI * (t1-t0) ** 2
 
     return newX,newY,newVx,newVy
