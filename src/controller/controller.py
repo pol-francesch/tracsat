@@ -1,5 +1,4 @@
 from scipy.ndimage import gaussian_filter1d
-import matplotlib.pyplot as plt
 import numpy as np
 import math
 import time
@@ -8,8 +7,8 @@ import busio
 import adafruit_bno055
 
 def getWaypoints(x,y,threshold):
-    xW = np.array([0])
-    yW = np.array([0])
+    xW = np.array()
+    yW = np.array()
 
     deriv2 = np.array([])
 
@@ -64,7 +63,7 @@ def getWaypoints(x,y,threshold):
 
     return xW,yW
 
-def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY,waypointEdges,t0,sensor):
+def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY,waypointEdges,t0,sensor,f):
     thrusters = np.zeros(6) #number of thrusters, [+x,-x,+y,-y,+z,-z], 0 means off, 1 means on
 
     KpS = gains[0][0]
@@ -163,8 +162,8 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
         thrusters[5] = 1
 
     if errorS < .5 * waypointDist: #go to next checkpoint pair if tracsat has moved halway through current checkpoint pair
-        waypointEdges[0] += 1
-        waypointEdges[1] += 1
+        #waypointEdges[0] += 1
+        #waypointEdges[1] += 1
 
     integrals[0] = integralS
     integrals[1] = integralR
@@ -179,6 +178,8 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
     prevErrors[0] = errorS
     prevErrors[1] = errorR
     prevErrors[2] = errorT
+
+    f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thruster[0],thruster[1],thruster[2],thruster[3],thruster[4],thruster[5],uS,uR,uT))
 
     return thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0
 
