@@ -11,6 +11,7 @@ import RPi.GPIO as GPIO
 i2c = busio.I2C(board.SCL, board.SDA)
 sensor = adafruit_bno055.BNO055_I2C(i2c)
 
+
 posX = 17
 negX = 27
 posY = 10

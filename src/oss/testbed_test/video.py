@@ -1,5 +1,6 @@
 import numpy as np
-from cv2 import cv2
+# from cv2 import cv2
+import cv2
 
 
 def intToBits(x):
@@ -226,10 +227,12 @@ class ShowVideo:
 
 if __name__ == '__main__':
     video = Video(color='4bit')
-    showVideo = ShowVideo(color='4bit', compression=True)
-    frame_bits = video.getFrameBitCompressed()
+    showVideo = ShowVideo(color='4bit', compression=False)
+    # frame_bits = video.getFrameBitCompressed()
+    frame_bits = video.getFrameBitsFast()
     gray       = showVideo.getFrameBitToInt(frame_bits)
     print('passed')
+    # print(len(gray))
 
-    frame_bits2 = video.getFrameBitCompressed()
+    frame_bits2 = video.getFrameBitsFast()
     gray2       = showVideo.getFrameBitToInt(frame_bits2)
