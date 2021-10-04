@@ -186,7 +186,7 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
     prevErrors[2] = errorT
 
     f = open(fileName,"a")
-    f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(temp,t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thruster[0],thruster[1],thruster[2],thruster[3],thruster[4],thruster[5],uS,uR,uT))
+    f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(temp,t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5],uS,uR,uT))
     f.close()
 
     return thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0

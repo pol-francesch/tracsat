@@ -79,7 +79,7 @@ errorT = rT - euler1 #rotation error
 thrusters = np.zeros(6)
 
 f.write("%t0, t1, xPos, yPos, xVel, yVel, accX, accY, euler1, errorS, errorR, errorT, thruster1, thruster2, thruster3, thruster4, thruster5, thruster6, uS, uR, uT\n")
-f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(temp,t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thruster[0],thruster[1],thruster[2],thruster[3],thruster[4],thruster[5],0,0,0))
+f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(temp,t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5],0,0,0))
 f.close()
 
 objectPos = np.array([objectX, objectY])
