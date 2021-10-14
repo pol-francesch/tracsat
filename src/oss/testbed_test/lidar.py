@@ -113,10 +113,23 @@ class Lidar:
 
         return rms, width, angle
 
-if __name__ == '__main__':
+def get_data_over_time():
     lidar = Lidar(fov=3)
 
-    data = lidar.get_obs_data()
+    for i in range(20):
+        data = lidar.get_obs_data()
 
-    np.savetxt('angle.csv', lidar.theta, delimiter=', ')
-    np.savetxt('distance.csv', lidar.get_scan(), delimiter=', ')
+        file_name1 = 'angle_pos2_' + str(i) + '.csv'
+        file_name2 = 'distance_pos2_' + str(i) + '.csv'
+
+        np.savetxt(file_name1, lidar.theta, delimiter=', ')
+        np.savetxt(file_name2, lidar.get_scan(), delimiter=', ')
+
+if __name__ == '__main__':
+    # lidar = Lidar(fov=3)
+
+    # data = lidar.get_obs_data()
+
+    # np.savetxt('angle.csv', lidar.theta, delimiter=', ')
+    # np.savetxt('distance.csv', lidar.get_scan(), delimiter=', ')
+    get_data_over_time()
