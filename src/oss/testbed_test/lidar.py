@@ -118,4 +118,5 @@ if __name__ == '__main__':
 
     data = lidar.get_obs_data()
 
-    print(data)
+    np.savetxt('angle.csv', lidar.theta, delimiter=', ')
+    np.savetxt('distance.csv', lidar.get_scan(), delimiter=', ')

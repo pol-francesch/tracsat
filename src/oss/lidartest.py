@@ -1,5 +1,5 @@
 # Import pysicktim library as "lidar"
-import lidar_lib as lidar
+import testbed_test.lidar_lib as lidar
 # import pysicktim as lidar
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -90,7 +90,7 @@ def animate(i):
     lidar_polar.set_thetamax(45)
     lidar_polar.set_thetamin(315)
     plt.fill_between(theta, distances, alpha=0.2)
-    lidar_polar.scatter(theta, distances, s=1, c=distances)     # Colored points
+    lidar_polar.scatter(theta, distances, s=5, c=distances)     # Colored points
 
 
 def calc_rms(vals):
