@@ -1,5 +1,6 @@
 import numpy as np 
-from cv2 import cv2
+# from cv2 import cv2
+import cv2
 
 # Getting video
 cap = cv2.VideoCapture(0)
