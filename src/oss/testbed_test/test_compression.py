@@ -203,7 +203,8 @@ def compareColor(compression=False):
 
 def compareImages(low=False):
     # Get openCV started
-    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
 
     # Create picture
     cv2.namedWindow("TracSat", cv2.WINDOW_NORMAL)
@@ -277,7 +278,8 @@ def doesPseudoCompressionWork(color='8bit', compression=False):
 
 def testCompression():
     # Init the video
-    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
 
     # Get the old frame
     _, olFrame = cap.read()

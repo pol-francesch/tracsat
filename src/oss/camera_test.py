@@ -2,7 +2,8 @@ import numpy as np
 from cv2 import cv2
 
 # Getting video
-cap = cv2.VideoCapture(0)
+# cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # Setting FPS
 # cap.set(cv2.CAP_PROP_FPS, 1)
