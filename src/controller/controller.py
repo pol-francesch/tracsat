@@ -1,10 +1,11 @@
-from scipy.ndimage import gaussian_filter1d
+#from scipy.ndimage import gaussian_filter1d
 import numpy as np
 import math
 import time
-import board
-import busio
-import adafruit_bno055
+#import board
+#import busio
+#import adafruit_bno055
+import simulation
 
 def getWaypoints(x,y,threshold):
     xW = np.array([])
@@ -63,7 +64,7 @@ def getWaypoints(x,y,threshold):
 
     return xW,yW
 
-def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY,waypointEdges,t0,sensor,fileName):
+def pid(objectPos,satPos,integrals,gains,prevErrors,waypointsX,waypointsY,waypointEdges,t0,f,lidar):
     thrusters = np.zeros(6) #number of thrusters, [+x,-x,+y,-y,+z,-z], 0 means off, 1 means on
 
     KpS = gains[0][0]
@@ -78,7 +79,7 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
     KiT = gains[2][1]
     KdT = gains[2][2]
 
-    uTolerance = .1
+    uTolerance = 0
 
     xW = waypointsX
     yW = waypointsY
@@ -110,26 +111,31 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
 
     waypointDist = math.sqrt(((yW[endWaypoint]-yW[startWaypoint])**2+(xW[endWaypoint]-xW[startWaypoint])**2)) #distance between checkpoints
 
-    #get euler angle
-    accX, accY, accZ = sensor.linear_acceleration
-    euler1, euler2, euler3 = sensor.euler
+    [vectorX, vectorY] = lidar.findObject()
 
-    euler1 = euler1 * math.pi/180
-    euler1 = 2*math.pi - euler1
+    keepRunning = 1
+
+    if vectorX == 0 and vectorY == 0:
+        keepRunning = 0
+
+    posX = objectX - vectorX
+    posY = objectY - vectorY
+
+    euler1 = math.atan2(vectorY,vectorX)
 
     t1 = time.time()
 
-    xPos, yPos, xVel, yVel = updateKinematics(xPos,yPos,xVel,yVel,euler1,accX,accY,t0,t1)
+    rS = waypointDist
+    currentS = (math.cos(phi)*(xPos - xW[startWaypoint]) + math.sin(phi)*(yPos - yW[startWaypoint]))
+    errorS = rS - currentS
+    rR = 0
+    currentR = -math.sin(phi)*(xPos - xW[startWaypoint]) + math.cos(phi)*(yPos - yW[startWaypoint])
+    errorR = rR - currentR
+    #rT = math.atan2((objectY - yPos),(objectX - xPos)) #rotation setpoint
+    rT = 0
 
-    errorS = waypointDist - (math.cos(phi)*(xPos - xW[startWaypoint]) + math.sin(phi)*(yPos - yW[startWaypoint])) #error along path
-    errorR = -math.sin(phi)*(xPos - xW[startWaypoint]) + math.cos(phi)*(yPos - yW[startWaypoint]) #error perpendicular to path
-    rT = math.atan2((objectY - yPos),(objectX - xPos)) #rotation setpoint
-    if rT < 0:
-        rT += math.pi*2
-
-    rT = 90*math.pi/180 #hardcoding orientation to see if it works
-
-    errorT = rT - euler1 #rotation error
+    currentT = euler1
+    errorT = rT - currentT #rotation error
 
     #approximate all integrals
     integralS += errorS * (t1-t0)
@@ -167,9 +173,9 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
     elif uT <= -uTolerance:
         thrusters[5] = 1
 
-    if errorS < .5 * waypointDist: #go to next checkpoint pair if tracsat has moved halway through current checkpoint pair
-        waypointEdges[0] += 0
-        waypointEdges[1] += 0
+    if errorS < .25 * waypointDist and waypointEdges[1] < len(xW)-1: #go to next checkpoint pair if tracsat has moved halway through current checkpoint pair
+        waypointEdges[0] += 1
+        waypointEdges[1] += 1
 
     integrals[0] = integralS
     integrals[1] = integralR
@@ -185,11 +191,9 @@ def pid(objectPos,satPos,satVel,integrals,gains,prevErrors,waypointsX,waypointsY
     prevErrors[1] = errorR
     prevErrors[2] = errorT
 
-    f = open(fileName,"a")
-    f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(temp,t0,xPos,yPos,xVel,yVel,accX,accY,euler1,errorS,errorR,errorT,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5],uS,uR,uT))
-    f.close()
+    f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(temp,t0,rS,currentS,errorS,rR,currentR,errorR,rT,currentT,errorT,xPos,yPos,objectX,objectY,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5]))
 
-    return thrusters,satPos,satVel,integrals,prevErrors,waypointEdges,t0
+    return thrusters,satPos,integrals,prevErrors,waypointEdges,t0,endNow
 
 def updateKinematics(currentX,currentY,currentVx,currentVy,euler1,accX,accY,t0,t1):
     #convert body accelerations to inertial accelerations
