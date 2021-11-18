@@ -122,9 +122,9 @@ keepRunning = 1
 while keepRunning == 1:
     thrusters,satPos,integrals,prevErrors,waypointEdges,t0,keepRunning = controller.pid(objectPos,satPos,integrals,gains,prevErrors,xW,yW,waypointEdges,t0,f,lidar)
 
-     if thrusters[0] == 1:
+    if thrusters[0] == 1:
          GPIO.output(posX, GPIO.HIGH)
-     else:
+    else:
          GPIO.output(posX, GPIO.LOW)
 
     if thrusters[1] == 1:
