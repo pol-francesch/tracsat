@@ -1,11 +1,15 @@
 import math
 import time
 import RPi.GPIO as GPIO
+import board
+import busio
+import adafruit_bno055
 
-GPIO.setmode(GPIO.BOARD)
+i2c = busio.I2C(board.SCL, board.SDA)
+sensor = adafruit_bno055.BNO055_I2C(i2c)
 
-posX = 17
-negX = 27
+posX = 27
+negX = 22
 posY = 10
 negY = 9
 posZ = 5
@@ -25,6 +29,14 @@ GPIO.output(negY, GPIO.LOW)
 GPIO.output(posZ, GPIO.LOW)
 GPIO.output(negZ, GPIO.LOW)
 
+def solTest(pin):
+    # for i in range(1,15):
+    GPIO.output(pin,GPIO.HIGH)
+    time.sleep(1)
+    GPIO.output(pin,GPIO.LOW)
+    print(pin)
+
+time.sleep(1)
 solTest(posX)
 time.sleep(1)
 solTest(negX)
@@ -38,8 +50,4 @@ time.sleep(1)
 solTest(negZ)
 time.sleep(1)
 
-def solTest(pin):
-    for i in range(1,15):
-        GPIO.output(pin,GPIO.HIGH)
-        time.sleep(.015)
-        GPIO.output(pin,GPIO.LOW)
+

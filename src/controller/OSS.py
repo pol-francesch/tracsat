@@ -152,4 +152,5 @@ while keepRunning == 1:
     else:
         GPIO.output(negZ, GPIO.LOW)
 
-    time.sleep(.015) #wait for solenoids to fully open/close
+    time.sleep(.05) #wait for solenoids to fully open/close
+f.close()
