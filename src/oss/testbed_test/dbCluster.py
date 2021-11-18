@@ -5,6 +5,49 @@ from sklearn.cluster import DBSCAN
 from sklearn import metrics
 import matplotlib.pyplot as plt
 
+# Need to call Pol's code to get lidar data, but waiting to see if Jack wants
+# to handle that control with lidar data instead
+# meanwhile csv files for distance and angle have been copied into this branch
+# in testbed_test
+
+# Plotting function but technically you don't need it
+# def plotObject(labels, X, sample_cores, min_obj_pts, max_obj_pts):
+#
+#     objXY = [0,0]
+#
+#     colours = ['red','blue','green','yellow','cyan','magenta','orange','aqua','pink']
+#
+#     # Black removed and is used for noise instead.
+#     unique_labels = set(labels)
+#     for k, col in zip(unique_labels, colours):
+#         if k == -1:
+#             # Black used for noise.
+#             col = [0, 0, 0, 1]
+#
+#         class_member_mask = (labels == k)
+#
+#         xy = X[class_member_mask & sample_cores]
+#         #print(xy)
+#         #print(col)
+#
+#         # Identify object and get average vector
+#         if (len(xy) >= min_obj_pts and len(xy) < max_obj_pts):
+#             objXY = sum(xy) / len(xy)
+#             return objXY
+#
+#         plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=(col),
+#                  markeredgecolor=(col), markersize=3)
+#
+#         xy_noise = X[class_member_mask & ~sample_cores]
+#         plt.plot(xy_noise[:, 0], xy_noise[:, 1], 'o', markerfacecolor=(col),
+#                  markeredgecolor=(col), markersize=3)
+#
+#     # # # Comment out if display is unwanted # # #
+#     plt.grid()
+#     plt.show()
+#
+#     return objXY
+
 def parseDataFiles(distance_file, angle_file):
     with open(distance_file, 'r') as d:
         distance = d.readlines()
@@ -18,52 +61,64 @@ def parseDataFiles(distance_file, angle_file):
 
     return distance, alpha
 
-#distance, alpha = parseDataFiles('data/distance_closetowall_15.csv', 'data/angle_closetowall_15.csv')
-distance, alpha = parseDataFiles('data_ellen/distance_obstacle_18.csv', 'data_ellen/angle_obstacle_18.csv')
-alpha = (np.linspace(-135,135,811)*np.pi/180.0).tolist()
-print(alpha)
-x = [distance[i] * math.cos(alpha[i]) for i in range(0, len(distance))]
-y = [distance[i] * math.sin(alpha[i]) for i in range(0, len(distance))]
-X_list = [[x[i], y[i]] for i in range(len(distance))]
+def findObject(distance_file, angle_file):
 
-# Make X into an array
-X = np.array(X_list)
+    # Call csv file parser
+    distance, alpha = parseDataFiles(distance_file, angle_file)
 
-# Compute DBSCAN
-db = DBSCAN(eps=0.3, min_samples=7)
+    alpha = (np.linspace(-135,135,811)*np.pi/180.0).tolist()
+    x = [distance[i] * math.cos(alpha[i]) for i in range(0, len(distance))]
+    y = [distance[i] * math.sin(alpha[i]) for i in range(0, len(distance))]
+    X_list = [[x[i], y[i]] for i in range(len(distance))]
 
-# Fit model
-model = db.fit(X)
-labels = model.labels_
+    # Make X into an array
+    X = np.array(X_list)
 
-# Identify the points which make up core points
-sample_cores = np.zeros_like(labels, dtype=bool)
-sample_cores[db.core_sample_indices_] = True
+    # minimum data points that the object takes up at the maximum distance
+    min_obj_pts = 9
+    max_obj_pts = 30
 
-# Number of clusters in labels, ignoring noise if present.
-n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
-n_noise_ = list(labels).count(-1)
+    # Compute DBSCAN
+    db = DBSCAN(eps=0.3, min_samples=min_obj_pts)
 
-colours = ['red','blue','green','yellow','cyan','magenta','orange','aqua','pink']
+    # Fit model
+    model = db.fit(X)
+    labels = model.labels_
 
-# Black removed and is used for noise instead.
-unique_labels = set(labels)
-for k, col in zip(unique_labels, colours):
-    if k == -1:
-        # Black used for noise.
-        col = [0, 0, 0, 1]
+    # Identify the points which make up core points
+    sample_cores = np.zeros_like(labels, dtype=bool)
+    sample_cores[db.core_sample_indices_] = True
 
-    class_member_mask = (labels == k)
+    # Number of clusters in labels, ignoring noise if present.
+    n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+    n_noise_ = list(labels).count(-1)
 
-    xy = X[class_member_mask & sample_cores]
-    print(xy)
-    print(col)
-    plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=(col),
-             markeredgecolor=(col), markersize=3)
+    objXY = [0,0]
 
-    xy = X[class_member_mask & ~sample_cores]
-    plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=(col),
-             markeredgecolor=(col), markersize=3)
+    colours = ['red','blue','green','yellow','cyan','magenta','orange','aqua','pink']
 
-plt.grid()
-plt.show()
+    # Black removed and is used for noise instead.
+    unique_labels = set(labels)
+    for k, col in zip(unique_labels, colours):
+        if k == -1:
+            # Black used for noise.
+            col = [0, 0, 0, 1]
+
+        class_member_mask = (labels == k)
+
+        xy = X[class_member_mask & sample_cores]
+
+        # Identify object and get average vector
+        if (len(xy) >= min_obj_pts and len(xy) < max_obj_pts):
+            objXY = sum(xy) / len(xy)
+            return objXY
+
+    # Display object location
+    # objXY = plotObject(labels, X, sample_cores, min_obj_pts, max_obj_pts)
+    # return objXY
+    return [0,0]
+
+# function call by Jack
+[objX, objY] = findObject('distance_obstacle_9.csv', 'angle_obstacle_9.csv')
+print(objX)
+print(objY)
