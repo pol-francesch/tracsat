@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 #from scipy.ndimage import gaussian_filter1d
 import numpy as np
 import math
@@ -7,7 +10,7 @@ import time
 #import adafruit_bno055
 import controller
 import RPi.GPIO as GPIO
-from oss.testbed_test.lidar import Lidar
+from lidar import Lidar
 #import simulation
 
 #i2c = busio.I2C(board.SCL, board.SDA)
@@ -42,7 +45,7 @@ GPIO.output(negZ, GPIO.LOW)
 
 directionPins = np.array([posX,negX,posY,negY,posZ,negZ])
 
-fileName = "logFile.txt"
+fileName = "/home/pi/tracsat/src/controller/logFile" + str(round(time.time())) + ".txt"
 
 f = open(fileName,"w")
 
@@ -53,6 +56,7 @@ xPos = 0
 yPos = 0
 
 t0 = time.time()
+startTime = t0
 
 lidar = Lidar()
 
@@ -68,8 +72,8 @@ distToObject = math.sqrt((objectX)**2+(objectY)**2)
 euler1 = math.atan2(objectY,objectX)
 
 #points along path from path planning, assume x is in general direction from tracSat starting point to object
-x = np.array([0,.9*math.cos(euler1)])
-y = np.array([0,.9*math.sin(euler1)])
+x = np.array([0,.75*math.cos(euler1)])
+y = np.array([0,.75*math.sin(euler1)])
 #A = np.array([[0,0], [0.5,4], [1.5,5], [1.5,6.5], [.5,7.5], [-.5,7.5], [-1.5,6.5], [-1.5,5], [-.5,4]])
 #y, x = A.T
 
@@ -119,7 +123,7 @@ waypointEdges = np.array([startWaypoint,endWaypoint])
 
 keepRunning = 1
 
-while keepRunning == 1:
+while keepRunning == 1 and time.time() - startTime <= 60:
     thrusters,satPos,integrals,prevErrors,waypointEdges,t0,keepRunning = controller.pid(objectPos,satPos,integrals,gains,prevErrors,xW,yW,waypointEdges,t0,f,lidar)
 
     if thrusters[0] == 1:
@@ -154,3 +158,10 @@ while keepRunning == 1:
 
     time.sleep(.05) #wait for solenoids to fully open/close
 f.close()
+
+GPIO.output(posX,GPIO.LOW)
+GPIO.output(negX,GPIO.LOW)
+GPIO.output(posY,GPIO.LOW)
+GPIO.output(negY,GPIO.LOW)
+GPIO.output(posZ,GPIO.LOW)
+GPIO.output(negZ,GPIO.LOW)

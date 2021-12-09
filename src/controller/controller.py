@@ -79,7 +79,7 @@ def pid(objectPos,satPos,integrals,gains,prevErrors,waypointsX,waypointsY,waypoi
     KiT = gains[2][1]
     KdT = gains[2][2]
 
-    uTolerance = 0
+    uTolerance = 0.25
 
     xW = waypointsX
     yW = waypointsY
@@ -89,9 +89,6 @@ def pid(objectPos,satPos,integrals,gains,prevErrors,waypointsX,waypointsY,waypoi
 
     xPos = satPos[0]
     yPos = satPos[1]
-
-    xVel = satVel[0]
-    yVel = satVel[1]
 
     startWaypoint = waypointEdges[0]
     endWaypoint = waypointEdges[1]
@@ -184,16 +181,13 @@ def pid(objectPos,satPos,integrals,gains,prevErrors,waypointsX,waypointsY,waypoi
     satPos[0] = xPos
     satPos[1] = yPos
 
-    satVel[0] = xVel
-    satVel[1] = yVel
-
     prevErrors[0] = errorS
     prevErrors[1] = errorR
     prevErrors[2] = errorT
 
     f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(temp,t0,rS,currentS,errorS,rR,currentR,errorR,rT,currentT,errorT,xPos,yPos,objectX,objectY,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5]))
 
-    return thrusters,satPos,integrals,prevErrors,waypointEdges,t0,endNow
+    return thrusters,satPos,integrals,prevErrors,waypointEdges,t0,keepRunning
 
 def updateKinematics(currentX,currentY,currentVx,currentVy,euler1,accX,accY,t0,t1):
     #convert body accelerations to inertial accelerations
