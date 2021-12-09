@@ -11,10 +11,19 @@ import time
 import controller
 import RPi.GPIO as GPIO
 from lidar import Lidar
+#from src.oss.testbed_test.lidar import Lidar
+from datetime import datetime
 #import simulation
 
 #i2c = busio.I2C(board.SCL, board.SDA)
 #sensor = adafruit_bno055.BNO055_I2C(i2c)
+
+# datetime object containing current date and time
+now = str(datetime.now())
+now = now.replace(":","_")
+now = now.replace("-","_")
+now = now.replace(" ","__")
+fileName = "logFile" + now + ".txt"
 
 GPIO.setmode(GPIO.BCM)
 
@@ -106,8 +115,10 @@ rT = 0
 currentT = euler1
 errorT = rT - currentT #rotation error
 
-f.write("%t0,t1,rS,currentS,errorS,rR,currentR,errorR,rT,currentT,errorT,xPos,yPos,objectX,objectY,thruster1,thruster2,thruster3,thruster4,thruster5,thruster6\n")
-f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(temp,t0,rS,currentS,errorS,rR,currentR,errorR,rT,currentT,errorT,xPos,yPos,objectX,objectY,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5]))
+outputVec = np.array([temp,t0,rS,currentS,errorS,rR,currentR,errorR,rT,currentT,errorT,xPos,yPos,objectX,objectY,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5]])
+
+
+
 #f.close()
 
 objectPos = np.array([objectX, objectY])
@@ -122,9 +133,10 @@ prevErrors = np.array([errorS,errorR,errorT])
 waypointEdges = np.array([startWaypoint,endWaypoint])
 
 keepRunning = 1
+startT = time.time()
 
-while keepRunning == 1 and time.time() - startTime <= 60:
-    thrusters,satPos,integrals,prevErrors,waypointEdges,t0,keepRunning = controller.pid(objectPos,satPos,integrals,gains,prevErrors,xW,yW,waypointEdges,t0,f,lidar)
+while keepRunning == 1 and (time.time() - startT) < 60:
+    thrusters,satPos,integrals,prevErrors,waypointEdges,t0,keepRunning,outputVec = controller.pid(objectPos,satPos,integrals,gains,prevErrors,xW,yW,waypointEdges,t0,outputVec,lidar)
 
     if thrusters[0] == 1:
          GPIO.output(posX, GPIO.HIGH)
@@ -157,11 +169,61 @@ while keepRunning == 1 and time.time() - startTime <= 60:
         GPIO.output(negZ, GPIO.LOW)
 
     time.sleep(.05) #wait for solenoids to fully open/close
+
+GPIO.output(posX, GPIO.LOW)
+GPIO.output(negX, GPIO.LOW)
+GPIO.output(posY, GPIO.LOW)
+GPIO.output(negY, GPIO.LOW)
+GPIO.output(posZ, GPIO.LOW)
+GPIO.output(negZ, GPIO.LOW)
+
+f = open(fileName,"w")
+
+f.write("%t0,t1,rS,currentS,errorS,rR,currentR,errorR,rT,currentT,errorT,xPos,yPos,objectX,objectY,thruster1,thruster2,thruster3,thruster4,thruster5,thruster6\n")
+for i in range(0,len(outputVec)):
+    f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(outputVec[i][0],outputVec[i][1],outputVec[i][2],outputVec[i][3],outputVec[i][4],outputVec[i][5],outputVec[i][6],outputVec[i][7],outputVec[i][8],outputVec[i][9],outputVec[i][10],outputVec[i][11],outputVec[i][12],outputVec[i][13],outputVec[i][14],outputVec[i][15],outputVec[i][16],outputVec[i][17],outputVec[i][18],outputVec[i][19],outputVec[i][20]))
+
 f.close()
 
-GPIO.output(posX,GPIO.LOW)
-GPIO.output(negX,GPIO.LOW)
-GPIO.output(posY,GPIO.LOW)
-GPIO.output(negY,GPIO.LOW)
-GPIO.output(posZ,GPIO.LOW)
-GPIO.output(negZ,GPIO.LOW)
+GPIO.output(posX, GPIO.HIGH)
+GPIO.output(negX, GPIO.HIGH)
+GPIO.output(posY, GPIO.HIGH)
+GPIO.output(negY, GPIO.HIGH)
+GPIO.output(posZ, GPIO.HIGH)
+GPIO.output(negZ, GPIO.HIGH)
+time.sleep(.5)
+GPIO.output(posX, GPIO.LOW)
+GPIO.output(negX, GPIO.LOW)
+GPIO.output(posY, GPIO.LOW)
+GPIO.output(negY, GPIO.LOW)
+GPIO.output(posZ, GPIO.LOW)
+GPIO.output(negZ, GPIO.LOW)
+time.sleep(.5)
+GPIO.output(posX, GPIO.HIGH)
+GPIO.output(negX, GPIO.HIGH)
+GPIO.output(posY, GPIO.HIGH)
+GPIO.output(negY, GPIO.HIGH)
+GPIO.output(posZ, GPIO.HIGH)
+GPIO.output(negZ, GPIO.HIGH)
+time.sleep(.5)
+GPIO.output(posX, GPIO.LOW)
+GPIO.output(negX, GPIO.LOW)
+GPIO.output(posY, GPIO.LOW)
+GPIO.output(negY, GPIO.LOW)
+GPIO.output(posZ, GPIO.LOW)
+GPIO.output(negZ, GPIO.LOW)
+time.sleep(.5)
+GPIO.output(posX, GPIO.HIGH)
+GPIO.output(negX, GPIO.HIGH)
+GPIO.output(posY, GPIO.HIGH)
+GPIO.output(negY, GPIO.HIGH)
+GPIO.output(posZ, GPIO.HIGH)
+GPIO.output(negZ, GPIO.HIGH)
+time.sleep(.5)
+GPIO.output(posX, GPIO.LOW)
+GPIO.output(negX, GPIO.LOW)
+GPIO.output(posY, GPIO.LOW)
+GPIO.output(negY, GPIO.LOW)
+GPIO.output(posZ, GPIO.LOW)
+GPIO.output(negZ, GPIO.LOW)
+time.sleep(.5)
