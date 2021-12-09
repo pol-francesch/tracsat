@@ -64,7 +64,7 @@ def getWaypoints(x,y,threshold):
 
     return xW,yW
 
-def pid(objectPos,satPos,integrals,gains,prevErrors,waypointsX,waypointsY,waypointEdges,t0,f,lidar):
+def pid(objectPos,satPos,integrals,gains,prevErrors,waypointsX,waypointsY,waypointEdges,t0,f,lidar,):
     thrusters = np.zeros(6) #number of thrusters, [+x,-x,+y,-y,+z,-z], 0 means off, 1 means on
 
     KpS = gains[0][0]
@@ -191,9 +191,9 @@ def pid(objectPos,satPos,integrals,gains,prevErrors,waypointsX,waypointsY,waypoi
     prevErrors[1] = errorR
     prevErrors[2] = errorT
 
-    f.write("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(temp,t0,rS,currentS,errorS,rR,currentR,errorR,rT,currentT,errorT,xPos,yPos,objectX,objectY,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5]))
+    f = np.append(f,[[temp,t0,rS,currentS,errorS,rR,currentR,errorR,rT,currentT,errorT,xPos,yPos,objectX,objectY,thrusters[0],thrusters[1],thrusters[2],thrusters[3],thrusters[4],thrusters[5]]],axis = 0)
 
-    return thrusters,satPos,integrals,prevErrors,waypointEdges,t0,endNow
+    return thrusters,satPos,integrals,prevErrors,waypointEdges,t0,endNow,f
 
 def updateKinematics(currentX,currentY,currentVx,currentVy,euler1,accX,accY,t0,t1):
     #convert body accelerations to inertial accelerations
