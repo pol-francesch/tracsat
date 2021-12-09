@@ -23,7 +23,7 @@ now = str(datetime.now())
 now = now.replace(":","_")
 now = now.replace("-","_")
 now = now.replace(" ","__")
-fileName = "logFile" + now + ".txt"
+fileName = "/home/pi/tracsat/src/controller/logFile" + now + ".txt"
 
 GPIO.setmode(GPIO.BCM)
 
@@ -51,12 +51,6 @@ GPIO.output(posZ, GPIO.LOW)
 
 GPIO.setup(negZ, GPIO.OUT)
 GPIO.output(negZ, GPIO.LOW)
-
-directionPins = np.array([posX,negX,posY,negY,posZ,negZ])
-
-fileName = "/home/pi/tracsat/src/controller/logFile" + str(round(time.time())) + ".txt"
-
-f = open(fileName,"w")
 
 #PATH PLANNING AND OBJECT FINDING HERE
 
